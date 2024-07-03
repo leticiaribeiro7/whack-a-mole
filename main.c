@@ -3,16 +3,35 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <pthread.h>
+#include "intelfpgaup/KEY.h"
+
+int dataButton = 0;
+volatile int button_pressed = 0;
+
 #define MOUSEFILE "/dev/input/mice"
 
 
-// Limitando coordenadas entre 1 e 511
+// Limitando coordenadas entre 1 e 511 - endereço do poligono tem 9 bits
 void limitarCursor(int *x, int *y) {
     if (*x <= 1) *x = 1;
     if (*y <= 1) *y = 1;
     if (*x >= 511) *x = 511;
     if (*y >= 511) *y = 511;
 }
+
+void *button_detection(void *arg) {
+    while (1) {
+
+        if (dataButton == 0b0001) {
+            button_pressed = 1;
+        } else {
+            button_pressed = 0;
+        }
+        usleep(10000);
+    }
+}
+
 
 
 int main() {
@@ -24,6 +43,8 @@ int main() {
 
 
     // cria sprite de interrogação - matriz?
+    //dividir valor rgb normal por 32 da o valor que da pra usar aqui
+
     int i;
     //linha superior
     for (i = 10000; i <= 10040; i++) {
@@ -57,7 +78,7 @@ int main() {
         perror("Não é possível abrir o dispositivo do mouse");
         exit(EXIT_FAILURE);
     }
-
+    KEY_open(); // Abre botões da placa
     while(1) {
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0 ) { 
             define_poligon(1, 7, 1, 1, 0, x, y, 1); // limpa poligono
@@ -68,8 +89,22 @@ int main() {
             y -= y_disp;
             limitarCursor(&x, &y);
             define_poligon(1, 7, 1, 1, 2, x, y, 1);
+
+        // teste botão thread
+            KEY_read(&dataButton);
+              // Lógica principal do programa aqui
+            if (button_pressed) {
+                printf("Botão pressionado!\n");
+                // Lógica adicional quando o botão é pressionado
+                dataButton = 0; // Reseta o estado do botão após processamento
+            }
+
+            // Lógica do programa continua aqui
+            usleep(50000); // Aguarda por 50ms antes de verificar novamente (ajuste conforme necessário)
         } 
 
     }
+
+    KEY_close(); // fecha os botões da placa
 }
 
