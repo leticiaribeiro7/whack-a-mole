@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include "intelfpgaup/KEY.h"
+//#include "intelfpgaup/KEY.h"
 
 int dataButton = 0;
 volatile int button_pressed = 0;
@@ -13,11 +13,12 @@ volatile int button_pressed = 0;
 
 
 // Limitando coordenadas entre 1 e 511 - endereço do poligono tem 9 bits
+// coordenadas sprite: x e y ate 1024
 void limitarCursor(int *x, int *y) {
-    if (*x <= 1) *x = 1;
-    if (*y <= 1) *y = 1;
-    if (*x >= 511) *x = 511;
-    if (*y >= 511) *y = 511;
+    if (*x <= 0) *x = 0;
+    if (*y <= 0) *y = 0;
+    if (*x >= 620) *x = 620;
+    if (*y >= 461) *y = 461;
 }
 
 void *button_detection(void *arg) {
@@ -29,6 +30,13 @@ void *button_detection(void *arg) {
             button_pressed = 0;
         }
         usleep(10000);
+    }
+}
+
+void clear_background(){
+    int i;
+    for(i = 0; i < 4800; i++) {
+        set_background_block(i, 5, 6, 6);
     }
 }
 
@@ -78,26 +86,35 @@ int main() {
         perror("Não é possível abrir o dispositivo do mouse");
         exit(EXIT_FAILURE);
     }
-    KEY_open(); // Abre botões da placa
+    //KEY_open(); // Abre botões da placa
+    //set_background_color(1, 1, 7);
+   // clear_background();
+   set_background_block(10, 5, 7, 7);
+
     while(1) {
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0 ) { 
-            define_poligon(1, 7, 1, 1, 0, x, y, 1); // limpa poligono
+             system("clear");
+            //define_poligon(1, 7, 1, 1, 0, x, y, 1); // limpa poligono
+            set_sprite(1, x, y, 5, 0); // limpa sprite teoricamente
             x_disp = mouse_buffer[1];
             y_disp = mouse_buffer[2];
             leftButton = mouse_buffer[0] & 0x1;
             x += x_disp;
             y -= y_disp;
             limitarCursor(&x, &y);
-            define_poligon(1, 7, 1, 1, 2, x, y, 1);
+            set_sprite(1, x, y, 5, 1);
+            //define_poligon(1, 7, 1, 1, 2, x, y, 1);
+            printf("Posição X: %d, Posição Y: %d\n", x, y);
 
-        // teste botão thread
-            KEY_read(&dataButton);
+            //set_background_block(5, 6, 6, 6); // 666 apaga o background todo MENOS a posiçao 5
+        // teste botão thread;
+            //KEY_read(&dataButton);
               // Lógica principal do programa aqui
             if (button_pressed) {
-                printf("Botão pressionado!\n");
-                // Lógica adicional quando o botão é pressionado
-                dataButton = 0; // Reseta o estado do botão após processamento
-            }
+            //     printf("Botão pressionado!\n");
+            //     // Lógica adicional quando o botão é pressionado
+            //     dataButton = 0; // Reseta o estado do botão após processamento
+            // }
 
             // Lógica do programa continua aqui
             usleep(50000); // Aguarda por 50ms antes de verificar novamente (ajuste conforme necessário)
@@ -105,6 +122,8 @@ int main() {
 
     }
 
-    KEY_close(); // fecha os botões da placa
+    //KEY_close(); // fecha os botões da placa
+}
+
 }
 
