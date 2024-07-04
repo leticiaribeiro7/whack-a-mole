@@ -291,7 +291,7 @@ static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, in
  */
 static int instruction_WSM(int R, int G, int B, int endereco_memoria) {
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WSM;
-    *data_b_ptr = (B << 6) | (G << 4) | R;
+    *data_b_ptr = (B << 6) | (G << 3) | R;
 
     escrita_buffer();
     return 1;
