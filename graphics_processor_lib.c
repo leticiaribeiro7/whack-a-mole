@@ -163,3 +163,40 @@ int write_sprite_mem(int R, int G, int B, int endereco_memoria) {
     close(fd);
     return bytesWritten;
 }
+
+/**
+ * Desativa cor de fundo para o original
+*/
+void clear_background_color(){
+    set_background_color(0, 0, 0);
+}
+
+/**
+ * Limpa os blocos 8x8 pixels da tela
+*/
+void clear_background_block() {
+    int i;
+    for(i = 0; i < 4800; i++) {
+        set_background_block(i, 6, 7, 7);
+    }
+}
+
+/**
+ * Limpa todos os polígonos da tela
+*/
+void clear_poligonos(){
+    int i;
+    for (i = 0; i < 15; i++){
+        define_poligon(i, 0, 0, 0, 0, 0, 0, 0);
+    }
+}
+
+/**
+ * Limpa os sprites renderizados na tela
+*/
+void clear_sprite() {
+    int i;
+    for (i = 1; i < 32; i++) {
+        set_sprite(i, 0, 0, 0, 0);
+    }
+}
