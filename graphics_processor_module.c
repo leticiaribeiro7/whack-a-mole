@@ -232,6 +232,10 @@ static void escrita_buffer(void) {
  * \return 1 se a operação foi bem sucedida
  */
 static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offset, int sp) {
+    // Limitar R, G e B a 3 bits
+    R = R & 0x7;
+    G = G & 0x7;
+    B = B & 0x7;
 
     *data_a_ptr = (reg << 4) | OPCODE_WBR;
     if (sp) {
@@ -253,8 +257,15 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
  * \return 1 se a operação foi bem-sucedida
  */
 static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
+    // Limitar R, G e B a 3 bits
+    R = R & 0x7;
+    G = G & 0x7;
+    B = B & 0x7;
+
+    *data_b_ptr = 0;
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
     *data_b_ptr = (B << 6) | (G << 3) | R;
+    printk(KERN_INFO "DATA B: %d", *data_b_ptr);
 
     escrita_buffer();
     return 1;
@@ -274,6 +285,11 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
  * \return 1 se a operação foi bemsucedida
  */
 static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, int y, int endereco) {
+    // Limitar R, G e B a 3 bits
+    R = R & 0x7;
+    G = G & 0x7;
+    B = B & 0x7;
+
     *data_a_ptr = (endereco << 4) | OPCODE_DP;
     *data_b_ptr = (forma << 31) | (B << 28) | (G << 25) | (R << 22) | (tamanho << 18) | (y << 9) | x;
     escrita_buffer();
@@ -290,6 +306,11 @@ static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, in
  * \return 1 se a operação foi bem sucedida
  */
 static int instruction_WSM(int R, int G, int B, int endereco_memoria) {
+    // Limitar R, G e B a 3 bits
+    R = R & 0x7;
+    G = G & 0x7;
+    B = B & 0x7;
+
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WSM;
     *data_b_ptr = (B << 6) | (G << 3) | R;
 
