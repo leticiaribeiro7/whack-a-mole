@@ -254,7 +254,7 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
  */
 static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
-    *data_b_ptr = (B << 6) | (G << 4) | R;
+    *data_b_ptr = (B << 6) | (G << 3) | R;
 
     escrita_buffer();
     return 1;
