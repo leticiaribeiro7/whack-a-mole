@@ -33,12 +33,12 @@ void *button_detection(void *arg) {
     }
 }
 
-void clear_background(){
-    int i;
-    for(i = 0; i < 4800; i++) {
-        set_background_block(i, 5, 6, 6);
-    }
-}
+// void clear_background(){
+//     int i;
+//     for(i = 0; i < 4800; i++) {
+//         set_background_block(i, 6, 7, 7);
+//     }
+// }
 
 
 
@@ -89,8 +89,14 @@ int main() {
     //KEY_open(); // Abre botões da placa
     //set_background_color(1, 1, 7);
    // clear_background();
-   set_background_block(10, 5, 7, 7);
+    
+    //set_sprite(1, 10, 10, 9, 1);
 
+    //set_sprite(2, 50, 60, 8, 1);
+    //clear_sprite();
+
+    //clear_background();
+    
     while(1) {
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0 ) { 
              system("clear");
@@ -118,12 +124,11 @@ int main() {
 
             // Lógica do programa continua aqui
             usleep(50000); // Aguarda por 50ms antes de verificar novamente (ajuste conforme necessário)
-        } 
-
+            }        
+        }
     }
 
     //KEY_close(); // fecha os botões da placa
 }
 
-}
 
