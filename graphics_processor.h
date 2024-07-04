@@ -122,3 +122,10 @@ void increase_coordinate(Sprite* sp, int mirror);
  * \return      1 caso operação seja bem sucedida, e 0 caso contrário.
 */
 int collision(Sprite* sp1, Sprite* sp2);
+
+
+
+void clear_background_color();
+void clear_background_block();
+void clear_poligonos();
+void clear_sprite();
