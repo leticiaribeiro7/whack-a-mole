@@ -4,6 +4,9 @@
 #define WRREG_BASE 0xc0
 #define WRFULL 0xb0
 
+/* Botões*/
+#define KEYS_BASE 0x0
+
 /* Memory */
 #define DDR_BASE 0x00000000
 #define DDR_SPAN 0x3FFFFFFF
