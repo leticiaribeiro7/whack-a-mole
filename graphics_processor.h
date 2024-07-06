@@ -57,7 +57,7 @@ typedef struct {
  * \param[in] activation_bit : Estado de ativação do sprite
  * \return  1 caso operação seja bem sucedida, e 0 caso contrário
 */
-int set_sprite(int registrador, int x, int y, int offset, int activation_bit);
+void set_sprite(int registrador, int x, int y, int offset, int activation_bit);
 
 /**
  * \brief Modelar o background através de preenchimento dos blocos.
@@ -68,7 +68,7 @@ int set_sprite(int registrador, int x, int y, int offset, int activation_bit);
  * \param[in] B : Componente da cor azul.
  * \return          1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-int set_background_block(int endereco_memoria, int R, int G, int B);
+void set_background_block(int endereco_memoria, int R, int G, int B);
 
 /**
  * \brief Configura a cor base do background.
@@ -78,7 +78,7 @@ int set_background_block(int endereco_memoria, int R, int G, int B);
  * \param[in] B : Componente da cor azul.
  * \return    1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-int set_background_color(int R, int G, int B);
+void set_background_color(int R, int G, int B);
 
 /**
  * \brief Posicionar um polígono na tela.
@@ -93,7 +93,7 @@ int set_background_color(int R, int G, int B);
  * \param[in] endereco : Endereço de memória onde o polígono será armazenado.
  * \return    1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-int define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, int endereco);
+void define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, int endereco);
 
 /**
  * \brief Define um novo sprite.
@@ -104,7 +104,7 @@ int define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, in
  * \param[in] endereco_memoria : Endereço de memória onde o sprite será armazenado
  * \return    1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-int write_sprite_mem(int R, int G, int B, int endereco_memoria);
+void write_sprite_mem(int R, int G, int B, int endereco_memoria);
 
 /**
  * \brief Responsável por atualizar as coordenadas x e y de um sprit móvel de acordo ao seu ângulo de movimento e valor de deslocamento.
@@ -112,7 +112,7 @@ int write_sprite_mem(int R, int G, int B, int endereco_memoria);
  * \param[in] sp : Passagem por referência
  * \param[in] mirror : Coordenadas do sprite
 */
-void increase_coordinate(Sprite* sp, int mirror);
+void increase_coordinate(Sprite* sp, int step_x, int step_y);
 
 /**
  * \brief Verifica se ocorreu uma colisão entre dois sprites quaisquer.
