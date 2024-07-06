@@ -22,7 +22,7 @@ int main() {
     int fd;
     int x=0, y=0;
     int leftButton;
-    signed char x_disp, y_disp;
+    int x_disp, y_disp;
     char mouse_buffer[3];
 
 
@@ -69,6 +69,3 @@ int main() {
             }        
         }
     }
-
-
-
