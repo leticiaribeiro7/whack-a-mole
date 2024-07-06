@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "graphics_processor.h"
+
 #define WBR      1 /*Operação para escrever cor de fundo*/
 #define WBM      2 /*Operação para escrever bloco de fundo*/
 #define DP       3 /*Operação para definir polígono*/
@@ -78,7 +80,7 @@ void define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, i
  * \return Número de bytes escritos ou -1 em caso de erro.
  */
 void write_sprite_mem(int R, int G, int B, int endereco_memoria);
-
+int write_to_bus(unsigned char *buffer);
 
 void set_background_color(int R, int G, int B) {
     unsigned char buffer[MAX_SIZE]; /* Buffer que prepara um comando para configurar a cor de fundo com os valores fornecidos*/
@@ -114,13 +116,12 @@ void define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, i
 
 void write_sprite_mem(int R, int G, int B, int endereco_memoria) {
     unsigned char buffer[MAX_SIZE];
-
-    sprintf(buffer, "%d %d %d %d %d", WSM, R, G, B, endereco_memoria);  /* Prepara o comando para escrever o sprite na memória*/
+    printf("R: %d, G: %d, B: %d, Endereço: %d\n", R, G, B, endereco_memoria); // Verifica todos os valores antes de formatar o buffer    sprintf(buffer, "%d %d %d %d %d", WSM, R, G, B, endereco_memoria);  /* Prepara o comando para escrever o sprite na memória*/
     write_to_bus(buffer);
 
 }
 
-int write_to_bus(buffer) {
+int write_to_bus(unsigned char *buffer) {
     int fd;
 
     if ((fd = open("/dev/graphicProcessor", O_RDWR)) == -1) {
@@ -170,4 +171,10 @@ void clear_sprite() {
     for (i = 1; i < 32; i++) {
         set_sprite(i, 0, 0, 0, 0);
     }
+}
+
+//step: novas coord 
+void increase_coordinate(Sprite* sp, int step_x, int step_y) {
+    sp->coord_x = step_x;
+    sp->coord_y = step_y;
 }
