@@ -187,21 +187,32 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
     instruction = values[0];
     printk(KERN_INFO "Instrução escolhida: %d", instruction);
 
+    for (int i = 0; i <= length; i++) {
+        printk(KERN_INFO "valor %d: %d", i, msg[i]);
+    }
+
     /*Executa a instrução com base no código*/
-    if (instruction == WBR) {
-        sscanf(msg, "%d %d %d %d %d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4],
-               &values[5], &values[6], &values[7], &values[8]);
-        instruction_WBR(values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8]);
-    } else if (instruction == WBM) {
-        sscanf(msg, "%d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4]);
-        instruction_WBM(values[1], values[2], values[3], values[4]);
-    } else if (instruction == DP) {
-        sscanf(msg, "%d %d %d %d %d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4],
-               &values[5], &values[6], &values[7], &values[8]);
-        instruction_DP(values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8]);
-    } else if (instruction == WSM) {
-        sscanf(msg, "%d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4]);
-        instruction_WSM(values[1], values[2], values[3], values[4]);
+    switch (instruction) {
+        case WBR:
+            sscanf(msg, "%d %d %d %d %d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4],
+                &values[5], &values[6], &values[7], &values[8]);
+            instruction_WBR(values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8]);
+            break;
+        case WBM:
+            sscanf(msg, "%d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4]);
+            instruction_WBM(values[1], values[2], values[3], values[4]);
+            break;
+        case DP:
+            sscanf(msg, "%d %d %d %d %d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4],
+                &values[5], &values[6], &values[7], &values[8]);
+            instruction_DP(values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8]);
+            break;
+        case WSM:
+            sscanf(msg, "%d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4]);
+            instruction_WSM(values[1], values[2], values[3], values[4]);
+            break;
+        default:
+            break;
     }
 
     return length;
@@ -233,9 +244,9 @@ static void escrita_buffer(void) {
  */
 static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offset, int sp) {
     // Limitar R, G e B a 3 bits
-    R = R & 0x7;
-    G = G & 0x7;
-    B = B & 0x7;
+    R &= 0x7;
+    G &= 0x7;
+    B &= 0x7;
 
     *data_a_ptr = (reg << 4) | OPCODE_WBR;
     if (sp) {
@@ -258,9 +269,9 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
  */
 static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     // Limitar R, G e B a 3 bits
-    R = R & 0x7;
-    G = G & 0x7;
-    B = B & 0x7;
+    R &= 0x7;
+    G &= 0x7;
+    B &= 0x7;
 
     *data_b_ptr = 0;
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
@@ -286,9 +297,9 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
  */
 static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, int y, int endereco) {
     // Limitar R, G e B a 3 bits
-    R = R & 0x7;
-    G = G & 0x7;
-    B = B & 0x7;
+    R &= 0x7;
+    G &= 0x7;
+    B &= 0x7;
 
     *data_a_ptr = (endereco << 4) | OPCODE_DP;
     *data_b_ptr = (forma << 31) | (B << 28) | (G << 25) | (R << 22) | (tamanho << 18) | (y << 9) | x;
@@ -307,9 +318,9 @@ static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, in
  */
 static int instruction_WSM(int R, int G, int B, int endereco_memoria) {
     // Limitar R, G e B a 3 bits
-    R = R & 0x7;
-    G = G & 0x7;
-    B = B & 0x7;
+    R &= 0x7;
+    G &= 0x7;
+    B &= 0x7;
 
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WSM;
     *data_b_ptr = (B << 6) | (G << 3) | R;

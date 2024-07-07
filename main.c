@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include "matrix.h"
+#include "spritesRGB.h"
 
 
 #define MOUSEFILE "/dev/input/mice"
@@ -17,6 +17,7 @@ void limitarCursor(int *x, int *y) {
     if (*x >= 620) *x = 620;
     if (*y >= 461) *y = 461;
 }
+
 
 int main() {
     int fd;
@@ -35,7 +36,7 @@ int main() {
 
     //grava martelo
    for (int i = 0; i < 400; i++) {
-        write_sprite_mem(matrix[i][0], matrix[i][1], matrix[i][2], i);
+        write_sprite_mem(martelo[i][0], martelo[i][1], martelo[i][2], i);
     }
 
     Sprite_Fixed martelo;

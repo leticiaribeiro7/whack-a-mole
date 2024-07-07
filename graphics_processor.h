@@ -31,7 +31,6 @@
 typedef struct {
     int coord_x, coord_y;
     int direction, offset, data_register;
-    int step_x, step_y;
     int ativo, collision;
 } Sprite;
 
@@ -112,7 +111,7 @@ void write_sprite_mem(int R, int G, int B, int endereco_memoria);
  * \param[in] sp : Passagem por referência
  * \param[in] mirror : Coordenadas do sprite
 */
-void increase_coordinate(Sprite* sp, int step_x, int step_y);
+void change_coordinate(Sprite* sp, int new_x, int new_y);
 
 /**
  * \brief Verifica se ocorreu uma colisão entre dois sprites quaisquer.

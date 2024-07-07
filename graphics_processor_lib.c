@@ -173,8 +173,8 @@ void clear_sprite() {
     }
 }
 
-//step: novas coord 
-void increase_coordinate(Sprite* sp, int step_x, int step_y) {
-    sp->coord_x = step_x;
-    sp->coord_y = step_y;
+// Altera coordenadas do sprite
+void change_coordinate(Sprite* sp, int new_x, int new_y) {
+    sp->coord_x = new_x;
+    sp->coord_y = new_y;
 }
