@@ -174,7 +174,7 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
 
     int values[MAX_SIZE];
     int instruction = 0;
-
+    int i = 0;
     while (*wrfull_ptr) {} /*Aguarda a fila esvaziar antes de mandar novas instruções*/
 
     /*Copia os dados do buffer do usuário para a mensagem*/
@@ -187,9 +187,9 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
     instruction = values[0];
     printk(KERN_INFO "Instrução escolhida: %d", instruction);
 
-    for (int i = 0; i <= length; i++) {
-        printk(KERN_INFO "valor %d: %d", i, msg[i]);
-    }
+    // for (i; i <= length; i++) {
+    //     printk(KERN_INFO "valor %d: %d", i, msg[i]);
+    // }
 
     /*Executa a instrução com base no código*/
     switch (instruction) {
