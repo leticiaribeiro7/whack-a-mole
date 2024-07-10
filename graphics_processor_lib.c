@@ -116,7 +116,8 @@ void define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, i
 
 void write_sprite_mem(int R, int G, int B, int endereco_memoria) {
     unsigned char buffer[MAX_SIZE];
-    printf("R: %d, G: %d, B: %d, Endereço: %d\n", R, G, B, endereco_memoria); // Verifica todos os valores antes de formatar o buffer    sprintf(buffer, "%d %d %d %d %d", WSM, R, G, B, endereco_memoria);  /* Prepara o comando para escrever o sprite na memória*/
+    printf("R: %d, G: %d, B: %d, Endereço: %d\n", R, G, B, endereco_memoria); // Verifica todos os valores antes de formatar o buffer    
+    sprintf(buffer, "%d %d %d %d %d", WSM, R, G, B, endereco_memoria);  /* Prepara o comando para escrever o sprite na memória*/
     write_to_bus(buffer);
 
 }
