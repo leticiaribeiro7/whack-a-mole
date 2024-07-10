@@ -7,7 +7,7 @@ PWD := $(shell pwd)
 
 # Alvo principal (default)
 all:
-	$(MAKE) -C $(KDIR) M=$(PWD) modulesa
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 	sudo insmod graphics_processor_module.ko
 	sudo insmod buttons_interrupt.ko
 
