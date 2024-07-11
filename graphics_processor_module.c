@@ -185,11 +185,6 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
     /*Lê a instrução da mensagem*/
     sscanf(msg, "%d", &values[0]);
     instruction = values[0];
-    printk(KERN_INFO "Instrução escolhida: %d", instruction);
-
-    // for (i; i <= length; i++) {
-    //     printk(KERN_INFO "valor %d: %d", i, msg[i]);
-    // }
 
     /*Executa a instrução com base no código*/
     switch (instruction) {
