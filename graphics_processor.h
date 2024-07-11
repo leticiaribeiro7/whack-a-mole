@@ -120,7 +120,7 @@ void change_coordinate(Sprite* sp, int new_x, int new_y);
  * \param[in] sp2 : Passagem por referência da coord_y.
  * \return      1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-int collision(Sprite* sp1, Sprite* sp2);
+int collision(Sprite* sp1, Sprite_Fixed* sp2);
 
 
 
