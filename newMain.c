@@ -24,14 +24,14 @@ void* movimentoToupeira(void* arg) {
     int max_y = 200;
     int min_y = 150;
 
-    int i;
-    for (i = 0; i < 400; i++) {
-        int R = toupeiraSp[i][0];
-        int G = toupeiraSp[i][1];
-        int B = toupeiraSp[i][2];
-        int endereco_memoria = 10400 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
+    // int i;
+    // for (i = 0; i < 400; i++) {
+    //     int R = toupeiraSp[i][0];
+    //     int G = toupeiraSp[i][1];
+    //     int B = toupeiraSp[i][2];
+    //     int endereco_memoria = 10400 + i;
+    //     write_sprite_mem(R, G, B, endereco_memoria);
+    // }
 
     // Sprite toupeira;
     // toupeira.coord_x = 100;
@@ -61,6 +61,7 @@ void* mouse(void* arg) {
     void** args = (void**)arg;
     Sprite_Fixed* martelo = (Sprite_Fixed*)args[0];
     Sprite* toupeira = (Sprite*)args[1];
+    Sprite_Fixed* arbusto = (Sprite_Fixed*)args[2];
 
     int fd;
     int x = 0, y = 0;
@@ -76,15 +77,15 @@ void* mouse(void* arg) {
 
     clear_sprite();
 
-    // Grava martelo
-    int i;
-    for (i = 0; i < 400; i++) {
-        int R = marteloSp[i][0];
-        int G = marteloSp[i][1];
-        int B = marteloSp[i][2];
-        int endereco_memoria = 10400 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
+    // // Grava martelo
+    // int i;
+    // for (i = 0; i < 400; i++) {
+    //     int R = marteloSp[i][0];
+    //     int G = marteloSp[i][1];
+    //     int B = marteloSp[i][2];
+    //     int endereco_memoria = 10400 + i;
+    //     write_sprite_mem(R, G, B, endereco_memoria);
+    // }
 
     // Sprite_Fixed martelo;
     // martelo.coord_x = 0;
@@ -105,8 +106,15 @@ void* mouse(void* arg) {
             y -= y_disp;
 
             limitarCursor(&x, &y);
+            set_sprite(arbusto->data_register, arbusto->coord_x, arbusto->coord_y, arbusto->offset, arbusto->ativo);
 
             set_sprite(martelo->data_register, x, y, martelo->offset, 1);
+            martelo->coord_x = x;
+            martelo->coord_y = y;
+
+            if(collision(toupeira, martelo) && leftButton) {
+                printf("1 ponto");
+            }
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
 
@@ -122,7 +130,7 @@ int main() {
     toupeira.coord_x = 100;
     toupeira.coord_y = 150;
     toupeira.offset = 26;
-    toupeira.data_register = 2;
+    toupeira.data_register = 3;
     toupeira.ativo = 1;
     toupeira.collision = 0;
     toupeira.direction = 1; // 1 ou -1
@@ -135,7 +143,42 @@ int main() {
     martelo.ativo = 1;
     martelo.data_register = 1;
 
-    void* args[2] = { &martelo, &toupeira };
+    Sprite_Fixed arbusto;
+    arbusto.coord_x = 300;
+    arbusto.coord_y = 300;
+    arbusto.offset = 27;
+    arbusto.ativo = 1;
+    arbusto.data_register = 2; 
+// menor reg fica em cima
+
+    // Grava martelo
+    int i;
+    for (i = 0; i < 400; i++) {
+        int R = marteloSp[i][0];
+        int G = marteloSp[i][1];
+        int B = marteloSp[i][2];
+        int endereco_memoria = 10000 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = toupeiraSp[i][0];
+        int G = toupeiraSp[i][1];
+        int B = toupeiraSp[i][2];
+        int endereco_memoria = 10400 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = arbustoSp[i][0];
+        int G = arbustoSp[i][1];
+        int B = arbustoSp[i][2];
+        int endereco_memoria = 10800 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+
+    void* args[3] = { &martelo, &toupeira, &arbusto };
 
     // Cria as threads
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
@@ -144,12 +187,6 @@ int main() {
     }
     if (pthread_create(&thread2, NULL, mouse, (void*)args) != 0) {
         perror("Failed to create thread 2");
-        return 1;
-    }
-
-    // Espera pelas threads (não é necessário neste caso específico, mas é uma boa prática)
-    if (pthread_join(thread1, NULL) != 0) {
-        perror("Failed to join thread 1");
         return 1;
     }
     if (pthread_join(thread2, NULL) != 0) {
