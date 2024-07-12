@@ -13,6 +13,7 @@
 #define WSM      4 /*Operação para escrever sprite na memória*/
 
 #define MAX_SIZE 32
+#define SPRITE_SIZE 20
 
 /**
  * \brief Define a cor de fundo usando valores RGB.
@@ -178,4 +179,12 @@ void clear_sprite() {
 void change_coordinate(Sprite* sp, int new_x, int new_y) {
     sp->coord_x = new_x;
     sp->coord_y = new_y;
+}
+
+
+int collision(Sprite* sp1, Sprite_Fixed* sp2) {
+    return sp1->coord_x < sp2->coord_x + SPRITE_SIZE &&
+           sp1->coord_x + SPRITE_SIZE > sp2->coord_x &&
+           sp1->coord_y < sp2->coord_y + SPRITE_SIZE &&
+           sp1->coord_y + SPRITE_SIZE > sp2->coord_y;
 }

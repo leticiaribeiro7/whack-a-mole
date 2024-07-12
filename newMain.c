@@ -19,6 +19,8 @@ void limitarCursor(int *x, int *y) {
 
 // Função que será executada na thread
 void* movimentoToupeira(void* arg) {
+
+    Sprite* toupeira = (Sprite*)arg;
     int max_y = 200;
     int min_y = 150;
 
@@ -31,22 +33,22 @@ void* movimentoToupeira(void* arg) {
         write_sprite_mem(R, G, B, endereco_memoria);
     }
 
-    Sprite toupeira;
-    toupeira.coord_x = 100;
-    toupeira.coord_y = 150;
-    toupeira.offset = 26;
-    toupeira.data_register = 2;
-    toupeira.ativo = 1;
-    toupeira.collision = 0;
-    toupeira.direction = 1; // 1 ou -1
+    // Sprite toupeira;
+    // toupeira.coord_x = 100;
+    // toupeira.coord_y = 150;
+    // toupeira.offset = 26;
+    // toupeira.data_register = 2;
+    // toupeira.ativo = 1;
+    // toupeira.collision = 0;
+    // toupeira.direction = 1; // 1 ou -1
 
     while (1) {
-        set_sprite(toupeira.data_register, toupeira.coord_x, toupeira.coord_y, toupeira.offset, toupeira.ativo);
+        set_sprite(toupeira->data_register, toupeira->coord_x, toupeira->coord_y, toupeira->offset, toupeira->ativo);
 
-        toupeira.coord_y += toupeira.direction * 5; // direction positivo: sobe, negativo: desce
+        toupeira->coord_y += toupeira->direction * 5; // direction positivo: sobe, negativo: desce
 
-        if (toupeira.coord_y >= max_y || toupeira.coord_y <= min_y) {
-            toupeira.direction = -toupeira.direction; // Inverte a direção corretamente
+        if (toupeira->coord_y >= max_y || toupeira->coord_y <= min_y) {
+            toupeira->direction = -toupeira->direction; // Inverte a direção
         }
 
         sleep(1);
@@ -55,6 +57,11 @@ void* movimentoToupeira(void* arg) {
 }
 
 void* mouse(void* arg) {
+
+    void** args = (void**)arg;
+    Sprite_Fixed* martelo = (Sprite_Fixed*)args[0];
+    Sprite* toupeira = (Sprite*)args[1];
+
     int fd;
     int x = 0, y = 0;
     int leftButton;
@@ -79,12 +86,12 @@ void* mouse(void* arg) {
         write_sprite_mem(R, G, B, endereco_memoria);
     }
 
-    Sprite_Fixed martelo;
-    martelo.coord_x = 0;
-    martelo.coord_y = 0;
-    martelo.offset = 25;
-    martelo.ativo = 1;
-    martelo.data_register = 1;
+    // Sprite_Fixed martelo;
+    // martelo.coord_x = 0;
+    // martelo.coord_y = 0;
+    // martelo.offset = 25;
+    // martelo.ativo = 1;
+    // martelo.data_register = 1;
 
     while (1) {
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
@@ -99,9 +106,10 @@ void* mouse(void* arg) {
 
             limitarCursor(&x, &y);
 
-            set_sprite(martelo.data_register, x, y, martelo.offset, 1);
+            set_sprite(martelo->data_register, x, y, martelo->offset, 1);
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
+
         }
     }
     return NULL;
@@ -110,12 +118,31 @@ void* mouse(void* arg) {
 int main() {
     pthread_t thread1, thread2;
 
+    Sprite toupeira;
+    toupeira.coord_x = 100;
+    toupeira.coord_y = 150;
+    toupeira.offset = 26;
+    toupeira.data_register = 2;
+    toupeira.ativo = 1;
+    toupeira.collision = 0;
+    toupeira.direction = 1; // 1 ou -1
+
+
+    Sprite_Fixed martelo;
+    martelo.coord_x = 0;
+    martelo.coord_y = 0;
+    martelo.offset = 25;
+    martelo.ativo = 1;
+    martelo.data_register = 1;
+
+    void* args[2] = { &martelo, &toupeira };
+
     // Cria as threads
-    if (pthread_create(&thread1, NULL, movimentoToupeira, NULL) != 0) {
+    if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
         perror("Failed to create thread 1");
         return 1;
     }
-    if (pthread_create(&thread2, NULL, mouse, NULL) != 0) {
+    if (pthread_create(&thread2, NULL, mouse, (void*)args) != 0) {
         perror("Failed to create thread 2");
         return 1;
     }
