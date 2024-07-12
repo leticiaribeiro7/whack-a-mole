@@ -69,7 +69,7 @@ static int __init iniciar(void) {
     int err = 0;
 
     if ((err = alloc_chrdev_region(&device_number, BASE_MINOR, DEVICE_COUNT, DEVICE_NAME)) < 0) { /*Aloca o número de dispositivo de caractere*/
-        printk(KERN_ERR "alloc_chrdev_region() falhou, erro %d\n", err);
+       // printk(KERN_ERR "alloc_chrdev_region() falhou, erro %d\n", err);
         return err;
     }
 
@@ -79,7 +79,7 @@ static int __init iniciar(void) {
 
     
     if ((err = cdev_add(&cdev, device_number, BASE_MINOR)) < 0) { /* Adiciona o dispositivo de caractere ao sistema*/
-        printk(KERN_ERR "cdev_add() falhou, erro: %d\n", err);
+       // printk(KERN_ERR "cdev_add() falhou, erro: %d\n", err);
         return err;
     }
 
@@ -96,7 +96,7 @@ static int __init iniciar(void) {
     wrreg_ptr = (int*)(LW_virtual + WRREG_BASE);
     wrfull_ptr = (int*)(LW_virtual + WRFULL);
 
-    printk(KERN_INFO "Driver carregado no sistema\n");
+   // printk(KERN_INFO "Driver carregado no sistema\n");
 
     return 0;
 }
@@ -116,7 +116,7 @@ static void __exit parar(void) {
     unregister_chrdev_region(device_number, DEVICE_COUNT);
     iounmap(LW_virtual);
 
-    printk(KERN_INFO "Driver removido do sistema\n");
+   // printk(KERN_INFO "Driver removido do sistema\n");
 }
 
 /**
@@ -127,7 +127,7 @@ static void __exit parar(void) {
  * \return 0 se a abertura foi bem sucedida
  */
 static int device_open(struct inode* inode, struct file* file) {
-    printk(KERN_INFO "Arquivo aberto no espaço do usuário\n");
+    //printk(KERN_INFO "Arquivo aberto no espaço do usuário\n");
     return 0;
 }
 
@@ -139,7 +139,7 @@ static int device_open(struct inode* inode, struct file* file) {
  * \return 0 quando o arquivo é fechado
  */
 static int device_release(struct inode* inode, struct file* file) {
-    printk(KERN_INFO "Arquivo fechado\n");
+    //printk(KERN_INFO "Arquivo fechado\n");
     return 0;
 }
 
@@ -156,7 +156,7 @@ static ssize_t device_read(struct file* filp, char* buffer, size_t length, loff_
 
     /*Copia a mensagem para o buffer do usuário*/
     if (copy_to_user(buffer, msg, length) != 0) {
-        printk(KERN_ERR "Erro: copy_to_user falhou\n");
+        //printk(KERN_ERR "Erro: copy_to_user falhou\n");
     }
     return length;
 }
@@ -179,7 +179,7 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
 
     /*Copia os dados do buffer do usuário para a mensagem*/
     if (copy_from_user(msg, buffer, length) != 0) {
-        printk(KERN_ERR "Erro: copy_from_user falhou\n");
+        //printk(KERN_ERR "Erro: copy_from_user falhou\n");
     }
 
     /*Lê a instrução da mensagem*/
@@ -271,8 +271,7 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     *data_b_ptr = 0;
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
     *data_b_ptr = (B << 6) | (G << 3) | R;
-    printk(KERN_INFO "DATA B: %d", *data_b_ptr);
-
+    
     escrita_buffer();
     return 1;
 }
