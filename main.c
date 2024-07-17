@@ -1,16 +1,13 @@
-#include "graphics_processor.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include "spritesRGB.h"
-
+#include "graphics_processor.h"
 
 #define MOUSEFILE "/dev/input/mice"
 
-
-// coordenadas sprite: x e y ate 1024
 void limitarCursor(int *x, int *y) {
     if (*x <= 0) *x = 0;
     if (*y <= 0) *y = 0;
@@ -18,74 +15,79 @@ void limitarCursor(int *x, int *y) {
     if (*y >= 461) *y = 461;
 }
 
+// Função que será executada na thread
+void* movimentoToupeira(void* arg) {
+    void** args = (void**)arg;
 
-int main() {
+    Sprite** toupeiras = (Sprite**)args[1];
+    Sprite_Fixed* arbusto = (Sprite_Fixed*)args[2];
+
+    // Sprite* toupeira2 = (Sprite*)args[3];
+    // Sprite* toupeira3 = (Sprite*)args[4];
+    // Sprite* toupeira4 = (Sprite*)args[5];
+    // Sprite* toupeira5 = (Sprite*)args[6];
+
+    int max_y = 200;
+    int min_y = 150;
+
+
+    // Sprite toupeira;
+    // toupeira.coord_x = 100;
+    // toupeira.coord_y = 150;
+    // toupeira.offset = 26;
+    // toupeira.data_register = 2;
+    // toupeira.ativo = 1;
+    // toupeira.collision = 0;
+    // toupeira.direction = 1; // 1 ou -1
+
+    while (1) {
+
+        set_sprite(arbusto->data_register, arbusto->coord_x, arbusto->coord_y, arbusto->offset, arbusto->ativo);
+
+        int i = 0;
+        for (i; i < 9; i++) {
+            set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
+
+            toupeiras[i]->coord_y += toupeiras[i]->direction * 5; // direction positivo: sobe, negativo: desce
+
+            if (toupeiras[i]->coord_y >= max_y || toupeiras[i]->coord_y <= min_y) {
+                toupeiras[i]->direction = -toupeiras[i]->direction; // Inverte a direção
+            }
+        }
+
+
+        sleep(1);
+    }
+    return NULL;
+}
+
+void* mouse(void* arg) {
+
+    void** args = (void**)arg;
+    Sprite_Fixed* martelo = (Sprite_Fixed*)args[0];
+    Sprite** toupeiras = (Sprite**)args[1];
+    Sprite_Fixed* arbusto = (Sprite_Fixed*)args[2];
+
+
     int fd;
-    int x=0, y=0;
+    int x = 0, y = 0;
     int leftButton;
     signed char x_disp, y_disp;
     char mouse_buffer[3];
 
-
     fd = open(MOUSEFILE, O_RDONLY); // Abre arquivo do mouse
-
-    if (fd == -1) {// Se o arquivo do mouse retornar -1 significa que deu erro ao abrir o dispositivo
+    if (fd == -1) { // Se o arquivo do mouse retornar -1 significa que deu erro ao abrir o dispositivo
         perror("Não é possível abrir o dispositivo do mouse");
         exit(EXIT_FAILURE);
     }
-    int i;
 
     clear_sprite();
 
-    //grava martelo
-    int j;
-    j = 0;
-    for (i = 10000; i < 10400; i++) {
-        int R = martelo[j][0];
-        int G = martelo[j][1];
-        int B = martelo[j][2];
-        j++;
-        write_sprite_mem(R, G, B, i);
-    }
 
-    Sprite_Fixed martelo;
-    martelo.coord_x = 0;
-    martelo.coord_y = 0;
-    martelo.offset = 25;
-    martelo.ativo = 1;
-    martelo.data_register = 1;
 
-    Sprite sp_movel;
-    sp_movel.coord_x = 100;
-    sp_movel.coord_y = 150;
-    sp_movel.offset = 9;
-    sp_movel.data_register = 2;
-    sp_movel.ativo = 1;
-    sp_movel.collision = 0;
-
-    //set_sprite(martelo.data_register, martelo.coord_x, martelo.coord_y, martelo.offset, martelo.ativo);
-            int p;
-            int q;
-            p = 0; q = 0;
-
-     while(1) {
-
-        set_sprite(2, p, q, 3, 1);
-
-        p++;
-        q++;
-
-        usleep(50000);
-
-        }
-    
-    while(1) {
-
-        if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0 ) { 
+    while (1) {
+        if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
             system("clear");
-            //define_poligon(1, 7, 1, 1, 0, x, y, 1); // limpa poligono
-
-            //set_sprite(martelo.data_register, x, y, martelo.offset, 0);
 
             x_disp = mouse_buffer[1];
             y_disp = mouse_buffer[2];
@@ -94,19 +96,193 @@ int main() {
             x += x_disp;
             y -= y_disp;
 
-            set_sprite(martelo.data_register, x, y, martelo.offset, 1);
-
             limitarCursor(&x, &y);
+            
+
+            set_sprite(martelo->data_register, x, y, martelo->offset, 1);
+            martelo->coord_x = x;
+            martelo->coord_y = y;
 
 
-            if (collision(&sp_movel, &martelo)) {
-                printf("Colisão detectada!\n");
-                // Lógica adicional para tratar a colisão
+            int i;
+            for (i = 0; i < 9; i++) {
+                if(collision(toupeiras[i], martelo) && leftButton) {
+                    printf("1 ponto");
+                }
             }
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
 
-            //usleep(50000); // Aguarda por 50ms antes de verificar novamente (ajuste conforme necessário)
-            }        
         }
     }
+    return NULL;
+}
+
+int main() {
+    pthread_t thread1, thread2;
+
+    //set_background_color(1, 4, 7);
+
+
+//primeira linha
+    Sprite toupeira1;
+    toupeira1.coord_x = 200;
+    toupeira1.coord_y = 250;
+    toupeira1.offset = 26;
+    toupeira1.data_register = 3;
+    toupeira1.ativo = 1;
+    toupeira1.collision = 0;
+    toupeira1.direction = 1; // 1 ou -1
+
+    Sprite toupeira2;
+    toupeira2.coord_x = 300;
+    toupeira2.coord_y = 250;
+    toupeira2.offset = 26;
+    toupeira2.data_register = 4;
+    toupeira2.ativo = 1;
+    toupeira2.collision = 0;
+    toupeira2.direction = 1; // 1 ou -1
+
+    Sprite toupeira3;
+    toupeira3.coord_x = 400;
+    toupeira3.coord_y = 250;
+    toupeira3.offset = 26;
+    toupeira3.data_register = 5;
+    toupeira3.ativo = 1;
+    toupeira3.collision = 0;
+    toupeira3.direction = 1; // 1 ou -1
+
+
+// segunda linha
+    Sprite toupeira4;
+    toupeira4.coord_x = 200;
+    toupeira4.coord_y = 300;
+    toupeira4.offset = 26;
+    toupeira4.data_register = 6;
+    toupeira4.ativo = 1;
+    toupeira4.collision = 0;
+    toupeira4.direction = 1; // 1 ou -1
+
+    Sprite toupeira5;
+    toupeira5.coord_x = 300;
+    toupeira5.coord_y = 300;
+    toupeira5.offset = 26;
+    toupeira5.data_register = 7;
+    toupeira5.ativo = 1;
+    toupeira5.collision = 0;
+    toupeira5.direction = 1; // 1 ou -1
+
+
+    Sprite toupeira6;
+    toupeira6.coord_x = 400;
+    toupeira6.coord_y = 300;
+    toupeira6.offset = 26;
+    toupeira6.data_register = 8;
+    toupeira6.ativo = 1;
+    toupeira6.collision = 0;
+    toupeira6.direction = 1; // 1 ou -1
+
+    // terceira linha
+    Sprite toupeira7;
+    toupeira7.coord_x = 200;
+    toupeira7.coord_y = 350;
+    toupeira7.offset = 26;
+    toupeira7.data_register = 9;
+    toupeira7.ativo = 1;
+    toupeira7.collision = 0;
+    toupeira7.direction = 1; // 1 ou -1
+
+    Sprite toupeira8;
+    toupeira8.coord_x = 300;
+    toupeira8.coord_y = 350;
+    toupeira8.offset = 26;
+    toupeira8.data_register = 10;
+    toupeira8.ativo = 1;
+    toupeira8.collision = 0;
+    toupeira8.direction = 1; // 1 ou -1
+
+    Sprite toupeira9;
+    toupeira9.coord_x = 400;
+    toupeira9.coord_y = 350;
+    toupeira9.offset = 26;
+    toupeira9.data_register = 11;
+    toupeira9.ativo = 1;
+    toupeira9.collision = 0;
+    toupeira9.direction = 1; // 1 ou -1
+
+
+
+    Sprite* toupeiras[9] = {
+    &toupeira1,
+    &toupeira2,
+    &toupeira3,
+    &toupeira4,
+    &toupeira5,
+    &toupeira6,
+    &toupeira7,
+    &toupeira8,
+    &toupeira9
+};
+
+
+    Sprite_Fixed martelo;
+    martelo.coord_x = 0;
+    martelo.coord_y = 0;
+    martelo.offset = 25;
+    martelo.ativo = 1;
+    martelo.data_register = 1;
+
+    Sprite_Fixed arbusto1;
+    arbusto1.coord_x = 100;
+    arbusto1.coord_y = 150;
+    arbusto1.offset = 27;
+    arbusto1.ativo = 1;
+    arbusto1.data_register = 2; 
+// menor reg fica em cima
+
+    // Grava martelo
+    int i;
+    for (i = 0; i < 380; i++) {
+        int R = marteloSp[i][0];
+        int G = marteloSp[i][1];
+        int B = marteloSp[i][2];
+        int endereco_memoria = 10000 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = toupeiraSp[i][0];
+        int G = toupeiraSp[i][1];
+        int B = toupeiraSp[i][2];
+        int endereco_memoria = 10400 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = arbusto[i][0];
+        int G = arbusto[i][1];
+        int B = arbusto[i][2];
+        int endereco_memoria = 10800 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+
+    void* args[3] = { &martelo, &toupeiras, &arbusto1 };
+
+    // Cria as threads
+    //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
+    if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
+        perror("Failed to create thread 1");
+        return 1;
+    }
+    if (pthread_create(&thread2, NULL, mouse, (void*)args) != 0) {
+        perror("Failed to create thread 2");
+        return 1;
+    }
+    if (pthread_join(thread2, NULL) != 0) {
+        perror("Failed to join thread 2");
+        return 1;
+    }
+
+    return 0;
+}
