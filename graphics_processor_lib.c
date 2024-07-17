@@ -15,6 +15,8 @@
 #define MAX_SIZE 32
 #define SPRITE_SIZE 20
 
+// https://www.istockphoto.com/br/vetor/pixel-de-brilho-colorido-bonito-pixel-cintilante-brilhante-estrela-brilhante-gm1501138740-522363421 sprites explosao
+
 /**
  * \brief Define a cor de fundo usando valores RGB.
  * 
