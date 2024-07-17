@@ -268,7 +268,6 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     G &= 0x7;
     B &= 0x7;
 
-    *data_b_ptr = 0;
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
     *data_b_ptr = (B << 6) | (G << 3) | R;
     
