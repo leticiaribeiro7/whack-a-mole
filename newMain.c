@@ -11,7 +11,8 @@
 
 #define MOUSEFILE "/dev/input/mice"
 volatile int* KEY_ptr;
-volatile int* HEX0_ptr; 
+//volatile int* HEX0_ptr; 
+volatile int* HEX3_HEX0_BASE_ptr; 
 int segmentos[10] = {0b1000000, 0b1111001, 0b0100100, 0b0110000, 0b0011001, 0b0010010, 0b0000010, 0b1111000, 0b0000000, 0b0010000};
 
 
@@ -46,13 +47,15 @@ void* detectButton(void* arg) {
 
     // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
     KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
-    HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
+    HEX3_HEX0_BASE_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
+    //HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
 
     while (1) {
         if (*KEY_ptr == 0b0111) {
-            
+            // DA TELA INICIAL PARA O JOGO
             set_background_color(7, 1, 1);
-        } 
+        }
+        
     }
 }
 
@@ -204,10 +207,20 @@ void* mouse(void* arg) {
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
             printf("\nPONTUAÇÃO: %d", pontuacao);
-            *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
-            if (pontuacao > 9) {
-                
-            }
+            //     ======= DISPLAY ========
+        
+           // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
+            // int dezena = pontuacao / 10;
+            // int unidade = pontuacao % 10;
+
+            // if (dezena > 0) {
+            //     display(dezena);
+            // }
+
+            // display(unidade);
+
+            // *HEX3_HEX0_BASE_ptr = display(unidade) << 0x8;
+            // *HEX3_HEX0_BASE_ptr = *HEX3_HEX0_BASE_ptr | display(dezena);
 
 
             //printf("botao: %d", *KEY_ptr); // tem logica invertida
@@ -461,6 +474,8 @@ int main() {
 
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
+
+    
     // Cria as threads
     //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
