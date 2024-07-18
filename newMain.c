@@ -423,3 +423,43 @@ int main() {
 
     return 0;
 }
+
+/*
+
+void* movimentoToupeira(void* arg) {
+    Toupeira* toupeiras = (Toupeira*)arg;
+
+    int max_y = 200;
+    int min_y = 150;
+
+    while (1) {
+        int current_time = time(NULL);
+        for (int i = 0; i < 9; i++) {
+            if (toupeiras[i].moving) {
+                // Movimenta a toupeira
+                toupeiras[i].sprite->coord_y += toupeiras[i].sprite->direction * 5;
+                
+                // Verifica se chegou ao limite e inverte a direção
+                if (toupeiras[i].sprite->coord_y >= toupeiras[i].max_y) {
+                    toupeiras[i].sprite->direction = -1;
+                } else if (toupeiras[i].sprite->coord_y <= toupeiras[i].min_y) {
+                    toupeiras[i].sprite->direction = 1;
+                    toupeiras[i].moving = 0; // Para a toupeira de se mover
+                    toupeiras[i].last_update = current_time; // Atualiza o tempo da última parada
+                }
+
+                // Atualiza o sprite
+                set_sprite(toupeiras[i].sprite->data_register, toupeiras[i].sprite->coord_x, toupeiras[i].sprite->coord_y, toupeiras[i].sprite->offset, toupeiras[i].sprite->ativo);
+            } else if (current_time - toupeiras[i].last_update >= toupeiras[i].interval) {
+                // Define um novo intervalo aleatório
+                toupeiras[i].interval = rand() % 5 + 1;
+                toupeiras[i].moving = 1; // Retoma o movimento da toupeira
+            }
+        }
+        usleep(50000); // 50ms
+    }
+    return NULL;
+}
+
+
+ */
