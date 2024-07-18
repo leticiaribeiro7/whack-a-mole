@@ -31,7 +31,8 @@
 typedef struct {
     int coord_x, coord_y;
     int direction, offset, data_register;
-    int ativo, collision;
+    int ativo, collision, moving;
+    int min_y, max_y, interval, last_update; 
 } Sprite;
 
 /**
