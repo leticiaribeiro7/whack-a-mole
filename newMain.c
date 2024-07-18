@@ -7,9 +7,13 @@
 #include "graphics_processor.h"
 #include <sys/mman.h>
 #include "address_map_arm.h"
+#include <stdint.h>
 
 #define MOUSEFILE "/dev/input/mice"
 volatile int* KEY_ptr;
+volatile int* HEX0_ptr; 
+int segmentos[10] = {0b1000000, 0b1111001, 0b0100100, 0b0110000, 0b0011001, 0b0010010, 0b0000010, 0b1111000, 0b0000000, 0b0010000};
+
 
 void limitarCursor(int *x, int *y) {
     if (*x <= 0) *x = 0;
@@ -42,6 +46,7 @@ void* detectButton(void* arg) {
 
     // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
     KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
+    HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
 
     while (1) {
         if (*KEY_ptr == 0b0111) {
@@ -78,38 +83,76 @@ void* movimentoToupeira(void* arg) {
     // toupeira.collision = 0;
     // toupeira.direction = 1; // 1 ou -1
 
-    while (1) {
+    // while (1) {
 
-        int i = 0;
-        for (i; i < 9; i++) {
-            set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
+    //     int i = 0;
+    //     for (i; i < 9; i++) {
+    //         set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
 
-            set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
+    //         set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
 
-            toupeiras[i]->coord_y += toupeiras[i]->direction * 5; // direction positivo: sobe, negativo: desce
+    //         toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // direction positivo: sobe, negativo: desce
 
-            if (i >= 0 || i <= 2) {
-                min_y = 250;
-                max_y = 300;
-            } 
-            if (i <= 3 || i >= 5) {
-                min_y = 350;
-                max_y = 400;
-            }
-            if ( i <= 6 || i <= 8) {
-                min_y = 450;
-                max_y = 500;
-            }
+    //         if (i >= 0 || i <= 2) {
+    //             min_y = 250;
+    //             max_y = 235;
+    //         } 
+    //        if (i >= 3 || i <= 5) {
+    //             min_y = 300;
+    //             max_y = 285;
+    //         }
+    //         // if ( i >= 6 || i <= 8) {
+    //         //     min_y = 350;
+    //         //     max_y = 335;
+    //         // }
 
-            if (toupeiras[i]->coord_y >= max_y || toupeiras[i]->coord_y <= arbustos[i]->coord_y) {
-                toupeiras[i]->direction = -toupeiras[i]->direction; // Inverte a direção
+
+    //         if (toupeiras[i]->coord_y <= max_y || toupeiras[i]->coord_y >= min_y) {
+    //             toupeiras[i]->direction = -toupeiras[i]->direction; // Inverte a direção
+    //         }
+    //     }
+
+
+    //     sleep(1);
+    // }
+    // return NULL;
+
+     while (1) {
+        int current_time = time(NULL);
+        int i;
+        for (i = 0; i < 9; i++) {
+            if (toupeiras[i]->moving) {
+                // Movimenta a toupeira
+                toupeiras[i]->coord_y -= toupeiras[i]->direction * 5;
+                
+                // Verifica se chegou ao limite e inverte a direção
+                if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
+                    toupeiras[i]->direction = -1;
+                } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
+                    toupeiras[i]->direction = 1;
+                    toupeiras[i]->moving = 0; // Para a toupeira de se mover
+                    //toupeiras[i]->ativo = 0;
+                    toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
+                }
+
+                // Atualiza o sprite
+                set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
+                set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
+            } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
+                // Define um novo intervalo aleatório
+                toupeiras[i]->interval = rand() % 5 + 1;
+                toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
             }
         }
+        usleep(300000); // 100ms
+     }
+}
+
+uint8_t display(int number) {
+    uint8_t segmentos_map = segmentos[number];
+    return segmentos_map;
 
 
-        usleep(50000);
-    }
-    return NULL;
 }
 
 void* mouse(void* arg) {
@@ -131,13 +174,7 @@ void* mouse(void* arg) {
         exit(EXIT_FAILURE);
     }
 
-    clear_sprite();
-    //clear_background_block();
-    clear_background_color();
-
-
-
-
+    int pontuacao = 0;
     while (1) {
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
             system("clear");
@@ -159,13 +196,21 @@ void* mouse(void* arg) {
 
             int i;
             for (i = 0; i < 9; i++) {
-                if(collision(toupeiras[i], martelo) && leftButton) {
-                    printf("1 ponto");
+                if(collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
+                    pontuacao+= 1;
+                    //printf("1 ponto");
                 }
             }
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
-            printf("botao: %d", *KEY_ptr); // tem logica invertida
+            printf("\nPONTUAÇÃO: %d", pontuacao);
+            *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
+            if (pontuacao > 9) {
+                
+            }
+
+
+            //printf("botao: %d", *KEY_ptr); // tem logica invertida
 
         }
     }
@@ -174,8 +219,8 @@ void* mouse(void* arg) {
 
 int main() {
     pthread_t thread1, thread2, thread3;
-
-    //set_background_color(1, 4, 7);
+    clear_sprite();
+    set_background_color(1, 4, 7);
 
 
 //primeira linha
@@ -187,6 +232,9 @@ int main() {
     toupeira1.ativo = 1;
     toupeira1.collision = 0;
     toupeira1.direction = 1; // 1 ou -1
+    toupeira1.moving = 1;
+    toupeira1.min_y = 250;
+    toupeira1.max_y = 235;
 
     Sprite toupeira2;
     toupeira2.coord_x = 300;
@@ -196,6 +244,9 @@ int main() {
     toupeira2.ativo = 1;
     toupeira2.collision = 0;
     toupeira2.direction = 1; // 1 ou -1
+    toupeira2.moving = 1;
+    toupeira2.min_y = 250;
+    toupeira2.max_y = 235;
 
     Sprite toupeira3;
     toupeira3.coord_x = 400;
@@ -205,66 +256,82 @@ int main() {
     toupeira3.ativo = 1;
     toupeira3.collision = 0;
     toupeira3.direction = 1; // 1 ou -1
-
+    toupeira3.moving = 1;
+    toupeira3.min_y = 250;
+    toupeira3.max_y = 235;
 
 // segunda linha
     Sprite toupeira4;
     toupeira4.coord_x = 200;
-    toupeira4.coord_y = 350;
+    toupeira4.coord_y = 300;
     toupeira4.offset = 26;
     toupeira4.data_register = 14;
     toupeira4.ativo = 1;
     toupeira4.collision = 0;
     toupeira4.direction = 1; // 1 ou -1
+    toupeira4.moving = 1;
+    toupeira4.min_y = 300;
+    toupeira4.max_y = 285;
 
     Sprite toupeira5;
     toupeira5.coord_x = 300;
-    toupeira5.coord_y = 350;
+    toupeira5.coord_y = 300;
     toupeira5.offset = 26;
     toupeira5.data_register = 15;
     toupeira5.ativo = 1;
     toupeira5.collision = 0;
     toupeira5.direction = 1; // 1 ou -1
-
+    toupeira5.moving = 1;
+    toupeira5.min_y = 300;
+    toupeira5.max_y = 285;
 
     Sprite toupeira6;
     toupeira6.coord_x = 400;
-    toupeira6.coord_y = 350;
+    toupeira6.coord_y = 300;
     toupeira6.offset = 26;
     toupeira6.data_register = 16;
     toupeira6.ativo = 1;
     toupeira6.collision = 0;
     toupeira6.direction = 1; // 1 ou -1
-
+    toupeira6.moving = 1;
+    toupeira6.min_y = 300;
+    toupeira6.max_y = 285;
     // terceira linha
     Sprite toupeira7;
     toupeira7.coord_x = 200;
-    toupeira7.coord_y = 450;
+    toupeira7.coord_y = 350;
     toupeira7.offset = 26;
     toupeira7.data_register = 17;
     toupeira7.ativo = 1;
     toupeira7.collision = 0;
     toupeira7.direction = 1; // 1 ou -1
+    toupeira7.moving = 1;
+    toupeira7.min_y = 350;
+    toupeira7.max_y = 335;
 
     Sprite toupeira8;
     toupeira8.coord_x = 300;
-    toupeira8.coord_y = 450;
+    toupeira8.coord_y = 350;
     toupeira8.offset = 26;
     toupeira8.data_register = 18;
     toupeira8.ativo = 1;
     toupeira8.collision = 0;
     toupeira8.direction = 1; // 1 ou -1
+    toupeira8.moving = 1;
+    toupeira8.min_y = 350;
+    toupeira8.max_y = 335;
 
     Sprite toupeira9;
     toupeira9.coord_x = 400;
-    toupeira9.coord_y = 450;
+    toupeira9.coord_y = 350;
     toupeira9.offset = 26;
     toupeira9.data_register = 19;
     toupeira9.ativo = 1;
     toupeira9.collision = 0;
     toupeira9.direction = 1; // 1 ou -1
-
-
+    toupeira9.moving = 1;
+    toupeira9.min_y = 350;
+    toupeira9.max_y = 335;
 
     Sprite* toupeiras[9] = {
         &toupeira1,
@@ -424,42 +491,39 @@ int main() {
     return 0;
 }
 
-/*
 
-void* movimentoToupeira(void* arg) {
-    Toupeira* toupeiras = (Toupeira*)arg;
+// void* movimentoToupeira(void* arg) {
+    
+//     int max_y = 200;
+//     int min_y = 150;
 
-    int max_y = 200;
-    int min_y = 150;
-
-    while (1) {
-        int current_time = time(NULL);
-        for (int i = 0; i < 9; i++) {
-            if (toupeiras[i].moving) {
-                // Movimenta a toupeira
-                toupeiras[i].sprite->coord_y += toupeiras[i].sprite->direction * 5;
+//     while (1) {
+//         int current_time = time(NULL);
+//         for (int i = 0; i < 9; i++) {
+//             if (toupeiras[i].moving) {
+//                 // Movimenta a toupeira
+//                 toupeiras[i]->coord_y += toupeiras[i]->direction * 5;
                 
-                // Verifica se chegou ao limite e inverte a direção
-                if (toupeiras[i].sprite->coord_y >= toupeiras[i].max_y) {
-                    toupeiras[i].sprite->direction = -1;
-                } else if (toupeiras[i].sprite->coord_y <= toupeiras[i].min_y) {
-                    toupeiras[i].sprite->direction = 1;
-                    toupeiras[i].moving = 0; // Para a toupeira de se mover
-                    toupeiras[i].last_update = current_time; // Atualiza o tempo da última parada
-                }
+//                 // Verifica se chegou ao limite e inverte a direção
+//                 if (toupeiras[i]->coord_y >= toupeiras[i].max_y) {
+//                     toupeiras[i]->direction = -1;
+//                 } else if (toupeiras[i]->coord_y <= toupeiras[i].min_y) {
+//                     toupeiras[i]->direction = 1;
+//                     toupeiras[i].moving = 0; // Para a toupeira de se mover
+//                     toupeiras[i].last_update = current_time; // Atualiza o tempo da última parada
+//                 }
 
-                // Atualiza o sprite
-                set_sprite(toupeiras[i].sprite->data_register, toupeiras[i].sprite->coord_x, toupeiras[i].sprite->coord_y, toupeiras[i].sprite->offset, toupeiras[i].sprite->ativo);
-            } else if (current_time - toupeiras[i].last_update >= toupeiras[i].interval) {
-                // Define um novo intervalo aleatório
-                toupeiras[i].interval = rand() % 5 + 1;
-                toupeiras[i].moving = 1; // Retoma o movimento da toupeira
-            }
-        }
-        usleep(50000); // 50ms
-    }
-    return NULL;
-}
+//                 // Atualiza o sprite
+//                 set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
+//             } else if (current_time - toupeiras[i].last_update >= toupeiras[i].interval) {
+//                 // Define um novo intervalo aleatório
+//                 toupeiras[i].interval = rand() % 5 + 1;
+//                 toupeiras[i].moving = 1; // Retoma o movimento da toupeira
+//             }
+//         }
+//         usleep(50000); // 50ms
+//     }
+//     return NULL;
+// }
 
 
- */
