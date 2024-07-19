@@ -32,6 +32,6 @@ def save_matrix_to_file(matrix, file_path):
             file.write(row_str + ',')
 
 # Exemplo de uso
-image_path = 'martelo.png'
+image_path = 'sprites/spark.png'
 matrix = get_image_matrix(image_path)
 save_matrix_to_file(matrix, 'matrix_rgb.txt')

@@ -8,54 +8,80 @@
 #include <sys/mman.h>
 #include "address_map_arm.h"
 #include <stdint.h>
+#include "screens.h"
 
 #define MOUSEFILE "/dev/input/mice"
 volatile int* KEY_ptr;
-//volatile int* HEX0_ptr; 
-volatile int* HEX3_HEX0_BASE_ptr; 
-int segmentos[10] = {0b1000000, 0b1111001, 0b0100100, 0b0110000, 0b0011001, 0b0010010, 0b0000010, 0b1111000, 0b0000000, 0b0010000};
+volatile int* HEX0_ptr; 
+volatile int* HEX1_ptr;
+//volatile int* HEX3_HEX0_BASE_ptr; 
 
+int segmentos[10] = {
+    0b1000000,
+    0b1111001,
+    0b0100100,
+    0b0110000,
+    0b0011001,
+    0b0010010,
+    0b0000010,
+    0b1111000,
+    0b0000000,
+    0b0010000
+};
+
+int gameStarted = 0; int encerrado = 0; int paused;
 
 void limitarCursor(int *x, int *y) {
-    if (*x <= 0) *x = 0;
-    if (*y <= 0) *y = 0;
+    if (*x <= 1) *x = 1;
+    if (*y <= 1) *y = 1;
     if (*x >= 620) *x = 620;
     if (*y >= 461) *y = 461;
 }
 
 
-void* detectButton(void* arg) {
+void* detectButton(void* arg) { // talvez nao precisa ser thread
     
-    int fd1 = -1; // used to open /dev/mem
+    int fd = -1; // used to open /dev/mem
     void *LW_virtual; // virtual address for light-weight bridge
 
 
     // Open /dev/mem to give access to physical addresses
-    if ((fd1 = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
+    if ((fd = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
         printf("ERROR: could not open \"/dev/mem\"\n");
-        return -1;
+        return NULL;
     }
 
     // Get a mapping from physical addresses to virtual addresses
-    LW_virtual = mmap(NULL, LW_BRIDGE_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd1, LW_BRIDGE_BASE);
+    LW_virtual = mmap(NULL, LW_BRIDGE_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, LW_BRIDGE_BASE);
 
     if (LW_virtual == MAP_FAILED) {
         printf("ERROR: mmap() failed\n");
-        close(fd1);
-        return -1;
+        close(fd);
+        return NULL;
     }
 
     // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
     KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
-    HEX3_HEX0_BASE_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
-    //HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
+    //HEX3_HEX0_BASE_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
+    HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
+    HEX1_ptr = (int *)(LW_virtual + HEX1_BASE);
 
     while (1) {
+        
         if (*KEY_ptr == 0b0111) {
             // DA TELA INICIAL PARA O JOGO
-            set_background_color(7, 1, 1);
+            gameStarted = 1;
+        } 
+
+        if (*KEY_ptr == 0b1110) {
+            gameStarted = 0;
+            //draw_stop_screen();
         }
-        
+
+        if (*KEY_ptr == 0b1011) {
+            paused = 1;
+            //draw_pause();
+        }
     }
 }
 
@@ -72,19 +98,6 @@ void* movimentoToupeira(void* arg) {
     // Sprite* toupeira3 = (Sprite*)args[4];
     // Sprite* toupeira4 = (Sprite*)args[5];
     // Sprite* toupeira5 = (Sprite*)args[6];
-
-    int max_y = 200;
-    int min_y = 150;
-
-
-    // Sprite toupeira;
-    // toupeira.coord_x = 100;
-    // toupeira.coord_y = 150;
-    // toupeira.offset = 26;
-    // toupeira.data_register = 2;
-    // toupeira.ativo = 1;
-    // toupeira.collision = 0;
-    // toupeira.direction = 1; // 1 ou -1
 
     // while (1) {
 
@@ -120,42 +133,42 @@ void* movimentoToupeira(void* arg) {
     // }
     // return NULL;
 
-     while (1) {
+    while (gameStarted) {
+
+        if (paused) continue;
+
         int current_time = time(NULL);
         int i;
         for (i = 0; i < 9; i++) {
             if (toupeiras[i]->moving) {
                 // Movimenta a toupeira
-                toupeiras[i]->coord_y -= toupeiras[i]->direction * 5;
+                toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
                 
                 // Verifica se chegou ao limite e inverte a direção
                 if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
                     toupeiras[i]->direction = -1;
                 } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
                     toupeiras[i]->direction = 1;
-                    toupeiras[i]->moving = 0; // Para a toupeira de se mover
-                    //toupeiras[i]->ativo = 0;
+                    toupeiras[i]->moving = 0;
                     toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
                 }
-
+                printf("toupeira numero %d\n", i);
                 // Atualiza o sprite
-                set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
                 set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
+                set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
             } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                 // Define um novo intervalo aleatório
                 toupeiras[i]->interval = rand() % 5 + 1;
                 toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
             }
         }
-        usleep(300000); // 100ms
-     }
+        usleep(300000); // 300ms
+    }
 }
 
 uint8_t display(int number) {
     uint8_t segmentos_map = segmentos[number];
     return segmentos_map;
-
-
 }
 
 void* mouse(void* arg) {
@@ -172,13 +185,13 @@ void* mouse(void* arg) {
     char mouse_buffer[3];
 
     fd = open(MOUSEFILE, O_RDONLY); // Abre arquivo do mouse
-    if (fd == -1) { // Se o arquivo do mouse retornar -1 significa que deu erro ao abrir o dispositivo
+    if (fd == -1) { // Se o arquivo do mouse retornar -1 significa que deu erro
         perror("Não é possível abrir o dispositivo do mouse");
         exit(EXIT_FAILURE);
     }
 
     int pontuacao = 0;
-    while (1) {
+    while (gameStarted) {
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
             system("clear");
 
@@ -200,7 +213,7 @@ void* mouse(void* arg) {
             int i;
             for (i = 0; i < 9; i++) {
                 if(collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
-                    pontuacao+= 1;
+                    pontuacao += 1;
                     //printf("1 ponto");
                 }
             }
@@ -210,33 +223,41 @@ void* mouse(void* arg) {
             //     ======= DISPLAY ========
         
            // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
-            // int dezena = pontuacao / 10;
-            // int unidade = pontuacao % 10;
+            int dezena = pontuacao / 10;
+            int unidade = pontuacao % 10;
 
-            // if (dezena > 0) {
-            //     display(dezena);
-            // }
 
-            // display(unidade);
-
-            // *HEX3_HEX0_BASE_ptr = display(unidade) << 0x8;
-            // *HEX3_HEX0_BASE_ptr = *HEX3_HEX0_BASE_ptr | display(dezena);
+            *HEX0_ptr = display(unidade);
+            *HEX1_ptr = display(dezena);
 
 
             //printf("botao: %d", *KEY_ptr); // tem logica invertida
 
         }
     }
+
+    if (!gameStarted) {
+        pontuacao = 0;
+    }
+
     return NULL;
 }
 
+
+
 int main() {
     pthread_t thread1, thread2, thread3;
+
     clear_sprite();
-    set_background_color(1, 4, 7);
+    clear_background_color();
+    clear_background_block();
+
+    //draw_initial_screen();
+
+    //set_background_color(1, 4, 7);
 
 
-//primeira linha
+// primeira linha
     Sprite toupeira1;
     toupeira1.coord_x = 200;
     toupeira1.coord_y = 250;
@@ -388,6 +409,8 @@ int main() {
     arbusto3.offset = 27;
     arbusto3.ativo = 1;
     arbusto3.data_register = 4; 
+
+
 // linha 2
     Sprite_Fixed arbusto4;
     arbusto4.coord_x = 200;
@@ -409,6 +432,7 @@ int main() {
     arbusto6.offset = 27;
     arbusto6.ativo = 1;
     arbusto6.data_register = 7; 
+
 //linha 3
     Sprite_Fixed arbusto7;
     arbusto7.coord_x = 200;
@@ -432,16 +456,16 @@ int main() {
     arbusto9.data_register = 10; 
     
     Sprite_Fixed* arbustos[9] = {
-    &arbusto1,
-    &arbusto2,
-    &arbusto3,
-    &arbusto4,
-    &arbusto5,
-    &arbusto6,
-    &arbusto7,
-    &arbusto8,
-    &arbusto9
-};
+        &arbusto1,
+        &arbusto2,
+        &arbusto3,
+        &arbusto4,
+        &arbusto5,
+        &arbusto6,
+        &arbusto7,
+        &arbusto8,
+        &arbusto9
+    };
 
 // menor reg fica em cima
 
@@ -464,9 +488,9 @@ int main() {
     }
 
     for (i = 0; i < 400; i++) {
-        int R = arbusto[i][0];
-        int G = arbusto[i][1];
-        int B = arbusto[i][2];
+        int R = arbustoSp[i][0];
+        int G = arbustoSp[i][1];
+        int B = arbustoSp[i][2];
         int endereco_memoria = 10800 + i;
         write_sprite_mem(R, G, B, endereco_memoria);
     }
@@ -475,19 +499,21 @@ int main() {
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
 
+    if (pthread_create(&thread3, NULL, detectButton, NULL) != 0) {
+        perror("Failed to create thread 3");
+        return 1;
+    }
     
+
     // Cria as threads
-    //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
+
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
         perror("Failed to create thread 1");
         return 1;
     }
+
     if (pthread_create(&thread2, NULL, mouse, (void*)args) != 0) {
         perror("Failed to create thread 2");
-        return 1;
-    }
-    if (pthread_create(&thread3, NULL, detectButton, NULL) != 0) {
-        perror("Failed to create thread 3");
         return 1;
     }
     if (pthread_join(thread1, NULL) != 0) {
@@ -498,6 +524,7 @@ int main() {
         perror("Failed to join thread 2");
         return 1;
     }
+    //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
     if (pthread_join(thread3, NULL) != 0) {
         perror("Failed to join thread 3");
         return 1;

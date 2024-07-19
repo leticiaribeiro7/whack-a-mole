@@ -156,7 +156,7 @@ static ssize_t device_read(struct file* filp, char* buffer, size_t length, loff_
 
     /*Copia a mensagem para o buffer do usuário*/
     if (copy_to_user(buffer, msg, length) != 0) {
-        //printk(KERN_ERR "Erro: copy_to_user falhou\n");
+        return -EFAULT;
     }
     return length;
 }
@@ -179,7 +179,7 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
 
     /*Copia os dados do buffer do usuário para a mensagem*/
     if (copy_from_user(msg, buffer, length) != 0) {
-        //printk(KERN_ERR "Erro: copy_from_user falhou\n");
+        return -EFAULT;
     }
 
     /*Lê a instrução da mensagem*/
@@ -254,7 +254,7 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
 }
 
 /**
- * \brief Instrução para escrita na memória do processador gráfico
+ * \brief Instrução para escrita na memória de background
  * 
  * \param[in] endereco_memoria : Endereço na memória
  * \param[in] R : Componente vermelho
@@ -267,7 +267,8 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     R &= 0x7;
     G &= 0x7;
     B &= 0x7;
-
+    endereco_memoria &= 0xFFF; // 12 bits
+    
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
     *data_b_ptr = (B << 6) | (G << 3) | R;
     
