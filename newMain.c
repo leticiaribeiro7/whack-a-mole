@@ -53,8 +53,7 @@ void* detectButton(void* arg) { // talvez nao precisa ser thread
 
     // Get a mapping from physical addresses to virtual addresses
     LW_virtual = mmap(NULL, LW_BRIDGE_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, LW_BRIDGE_BASE);
-
-    if (LW_virtual == MAP_FAILED) {
+     if (LW_virtual == MAP_FAILED) {
         printf("ERROR: mmap() failed\n");
         close(fd);
         return NULL;
@@ -80,9 +79,15 @@ void* detectButton(void* arg) { // talvez nao precisa ser thread
         }
 
         if (*KEY_ptr == 0b1011) {
+            printf("botao: %d", *KEY_ptr);
             paused = 1;
             //draw_pause();
         }
+
+        if (paused == 1 && *KEY_ptr == 0b1011) { // voltar do pause
+            paused = 0;
+        }
+
     }
 }
 
@@ -134,37 +139,42 @@ void* movimentoToupeira(void* arg) {
     // }
     // return NULL;
 
-    while (gameStarted) {
+    while (1) {
 
-        if (paused) continue;
+        while(gameStarted) {
 
-        int current_time = time(NULL);
-        int i;
-        for (i = 0; i < 9; i++) {
-            if (toupeiras[i]->moving) {
-                // Movimenta a toupeira
-                toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
-                
-                // Verifica se chegou ao limite e inverte a direção
-                if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
-                    toupeiras[i]->direction = -1;
-                } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
-                    toupeiras[i]->direction = 1;
-                    toupeiras[i]->moving = 0;
-                    toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
+            if (paused) continue;
+
+            int current_time = time(NULL);
+            int i;
+            for (i = 0; i < 9; i++) {
+                if (toupeiras[i]->moving) {
+                    // Movimenta a toupeira
+                    toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
+                    
+                    // Verifica se chegou ao limite e inverte a direção
+                    if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
+                        toupeiras[i]->direction = -1;
+                    } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
+                        toupeiras[i]->direction = 1;
+                        toupeiras[i]->moving = 0;
+                        toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
+                    }
+                    set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
+                    set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
+
+                    printf("toupeira numero %d\n", i);
+                    // Atualiza o sprite
+                } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
+                    // Define um novo intervalo aleatório
+                    toupeiras[i]->interval = rand() % 2 + 1;
+                    toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
                 }
-                printf("toupeira numero %d\n", i);
-                // Atualiza o sprite
-                set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
-                set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
-            } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
-                // Define um novo intervalo aleatório
-                toupeiras[i]->interval = rand() % 5 + 1;
-                toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
             }
+            usleep(300000); // 300ms
         }
-        usleep(300000); // 300ms
-    }
+
+        }
 }
 
 uint8_t display(int number) {
@@ -173,7 +183,6 @@ uint8_t display(int number) {
 }
 
 void* mouse(void* arg) {
-
     void** args = (void**)arg;
     Sprite_Fixed* martelo = (Sprite_Fixed*)args[0];
     Sprite** toupeiras = (Sprite**)args[1];
@@ -192,57 +201,58 @@ void* mouse(void* arg) {
     }
 
     int pontuacao = 0;
-    while (gameStarted) {
-        if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
-            system("clear");
+    while(1) {
 
-            x_disp = mouse_buffer[1];
-            y_disp = mouse_buffer[2];
-            leftButton = mouse_buffer[0] & 0x1;
+            if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
+                system("clear");
 
-            x += x_disp;
-            y -= y_disp;
+                x_disp = mouse_buffer[1];
+                y_disp = mouse_buffer[2];
+                leftButton = mouse_buffer[0] & 0x1;
 
-            limitarCursor(&x, &y);
-            
+                x += x_disp;
+                y -= y_disp;
 
-            set_sprite(martelo->data_register, x, y, martelo->offset, 1);
-            martelo->coord_x = x;
-            martelo->coord_y = y;
+                limitarCursor(&x, &y);
+                
+
+                set_sprite(martelo->data_register, x, y, martelo->offset, 1);
+                martelo->coord_x = x;
+                martelo->coord_y = y;
 
 
-            int i;
-            for (i = 0; i < 9; i++) {
-                if(collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
-                    pontuacao += 1;
-                    //printf("1 ponto");
+                int i;
+                for (i = 0; i < 9; i++) {
+                    if(collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
+                        pontuacao += 1;
+                        //printf("1 ponto");
+                    }
                 }
+
+                printf("Posição X: %d, Posição Y: %d\n", x, y);
+                printf("\nPONTUAÇÃO: %d", pontuacao);
+                //     ======= DISPLAY ========
+            
+            // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
+                int dezena = pontuacao / 10;
+                int unidade = pontuacao % 10;
+
+
+                *HEX0_ptr = display(unidade);
+                *HEX1_ptr = display(dezena);
+
+
+                //printf("botao: %d", *KEY_ptr); // tem logica invertida
+
             }
-
-            printf("Posição X: %d, Posição Y: %d\n", x, y);
-            printf("\nPONTUAÇÃO: %d", pontuacao);
-            //     ======= DISPLAY ========
-        
-           // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
-            int dezena = pontuacao / 10;
-            int unidade = pontuacao % 10;
-
-
-            *HEX0_ptr = display(unidade);
-            *HEX1_ptr = display(dezena);
-
-
-            //printf("botao: %d", *KEY_ptr); // tem logica invertida
-
         }
-    }
 
-    if (!gameStarted) {
-        pontuacao = 0;
-    }
+        if (!gameStarted) {
+            pontuacao = 0;
+        }
 
-    return NULL;
-}
+        return NULL;
+    }
 
 void write_sprites() {
 
@@ -279,12 +289,12 @@ int main() {
     pthread_t thread1, thread2, thread3;
 
     clear_sprite();
-    clear_background_color();
-    clear_background_block();
+    //clear_background_color();
+    //clear_background_block();
+    set_background_color(1, 4, 7);
 
     //draw_initial_screen();
 
-    //set_background_color(1, 4, 7);
 
 
 // primeira linha
@@ -511,12 +521,8 @@ int main() {
         return 1;
     }
 
-    if (pthread_join(thread3, NULL) != 0) {
-        perror("Failed to join thread 3");
-        return 1;
-    }
 
-    while(!gameStarted) {}
+   // while(!gameStarted) {}
 
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
         perror("Failed to create thread 1");
@@ -537,6 +543,10 @@ int main() {
     }
     //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
 
+    if (pthread_join(thread3, NULL) != 0) {
+        perror("Failed to join thread 3");
+        return 1;
+    }
 
 
     return 0;
