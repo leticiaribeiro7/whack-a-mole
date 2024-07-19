@@ -76,6 +76,7 @@ void* detectButton(void* arg) { // talvez nao precisa ser thread
         if (*KEY_ptr == 0b1110) {
             gameStarted = 0;
             //draw_stop_screen();
+            break;
         }
 
         if (*KEY_ptr == 0b1011) {
@@ -241,6 +242,35 @@ void* mouse(void* arg) {
     }
 
     return NULL;
+}
+
+void write_sprites() {
+
+    // Grava martelo
+    int i;
+    for (i = 0; i < 380; i++) {
+        int R = marteloSp[i][0];
+        int G = marteloSp[i][1];
+        int B = marteloSp[i][2];
+        int endereco_memoria = 10000 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = toupeiraSp[i][0];
+        int G = toupeiraSp[i][1];
+        int B = toupeiraSp[i][2];
+        int endereco_memoria = 10400 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = arbustoSp[i][0];
+        int G = arbustoSp[i][1];
+        int B = arbustoSp[i][2];
+        int endereco_memoria = 10800 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
 }
 
 
@@ -469,45 +499,24 @@ int main() {
 
 // menor reg fica em cima
 
-    // Grava martelo
-    int i;
-    for (i = 0; i < 380; i++) {
-        int R = marteloSp[i][0];
-        int G = marteloSp[i][1];
-        int B = marteloSp[i][2];
-        int endereco_memoria = 10000 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
-
-    for (i = 0; i < 400; i++) {
-        int R = toupeiraSp[i][0];
-        int G = toupeiraSp[i][1];
-        int B = toupeiraSp[i][2];
-        int endereco_memoria = 10400 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
-
-    for (i = 0; i < 400; i++) {
-        int R = arbustoSp[i][0];
-        int G = arbustoSp[i][1];
-        int B = arbustoSp[i][2];
-        int endereco_memoria = 10800 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
-
+    write_sprites();
 
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
-    while(!gameStarted) {}
 
+    // Cria as threads
 
     if (pthread_create(&thread3, NULL, detectButton, NULL) != 0) {
         perror("Failed to create thread 3");
         return 1;
     }
-    
 
-    // Cria as threads
+    if (pthread_join(thread3, NULL) != 0) {
+        perror("Failed to join thread 3");
+        return 1;
+    }
+
+    while(!gameStarted) {}
 
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
         perror("Failed to create thread 1");
@@ -527,10 +536,8 @@ int main() {
         return 1;
     }
     //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
-    if (pthread_join(thread3, NULL) != 0) {
-        perror("Failed to join thread 3");
-        return 1;
-    }
+
+
 
     return 0;
 }
