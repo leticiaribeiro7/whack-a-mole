@@ -79,7 +79,6 @@ void* detectButton(void* arg) { // talvez nao precisa ser thread
         }
 
         if (*KEY_ptr == 0b1011) {
-            printf("botao: %d", *KEY_ptr);
             paused = 1;
             //draw_pause();
         }
@@ -163,7 +162,7 @@ void* movimentoToupeira(void* arg) {
                     set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
                     set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
 
-                    printf("toupeira numero %d\n", i);
+                    //printf("toupeira numero %d\n", i);
                     // Atualiza o sprite
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                     // Define um novo intervalo aleatório
