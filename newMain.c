@@ -498,6 +498,8 @@ int main() {
 
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
+    while(!gameStarted) {}
+
 
     if (pthread_create(&thread3, NULL, detectButton, NULL) != 0) {
         perror("Failed to create thread 3");
