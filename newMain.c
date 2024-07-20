@@ -87,6 +87,20 @@ void* detectButton(void* arg) { // talvez nao precisa ser thread
             paused = 0;
         }
 
+        // ============= TESTAR BOTÃO DE PAUSE E DESPAUSE =============
+        //  if (*KEY_ptr == 0b1011) {
+        //     // Se o jogo estiver em andamento e não estiver pausado, pause
+        //     if (gameStarted && !paused) {
+        //         paused = 1;
+        //         usleep(200000); // debounce de 200ms
+        //     } 
+        //     // Se o jogo estiver pausado, despause
+        //     else if (gameStarted && paused) {
+        //         paused = 0;
+        //         usleep(200000); // debounce de 200ms
+        //     }
+        // }
+       
     }
 }
 
