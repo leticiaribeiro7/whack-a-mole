@@ -112,7 +112,7 @@ void write_sprite_mem(int R, int G, int B, int endereco_memoria);
  * \param[in] sp : Passagem por referência
  * \param[in] mirror : Coordenadas do sprite
 */
-void change_coordinate(Sprite* sp, int new_x, int new_y);
+void change_coordinate(Sprite_Fixed* sp, int new_x, int new_y);
 
 /**
  * \brief Verifica se ocorreu uma colisão entre dois sprites quaisquer.

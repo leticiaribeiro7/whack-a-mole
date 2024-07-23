@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "graphics_processor.h"
+#include "headers/graphics_processor.h"
 
 #define WBR      1 /*Operação para escrever cor de fundo*/
 #define WBM      2 /*Operação para escrever bloco de fundo*/
@@ -178,7 +178,7 @@ void clear_sprite() {
 }
 
 // Altera coordenadas do sprite
-void change_coordinate(Sprite* sp, int new_x, int new_y) {
+void change_coordinate(Sprite_Fixed* sp, int new_x, int new_y) {
     sp->coord_x = new_x;
     sp->coord_y = new_y;
 }

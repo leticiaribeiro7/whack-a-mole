@@ -3,18 +3,24 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include "spritesRGB.h"
-#include "graphics_processor.h"
 #include <sys/mman.h>
-#include "address_map_arm.h"
 #include <stdint.h>
-#include "screens.h"
+
+// #include "headers/screens.h"
+#include "headers/utils.h"
+#include "headers/spritesRGB.h"
+#include "headers/graphics_processor.h"
+#include "headers/address_map_arm.h"
 
 #define MOUSEFILE "/dev/input/mice"
-volatile int* KEY_ptr;
-volatile int* HEX0_ptr; 
-volatile int* HEX1_ptr;
-//volatile int* HEX3_HEX0_BASE_ptr; 
+
+extern volatile int* HEX0_ptr;
+extern volatile int* HEX1_ptr;
+extern volatile int* HEX3_0_ptr;
+extern volatile int* KEY_ptr;
+
+int button0, button1, button2;
+int gameStarted = 0; int paused = 0;
 
 int segmentos[10] = {
     0b1000000,
@@ -29,89 +35,95 @@ int segmentos[10] = {
     0b0010000
 };
 
-int gameStarted = 0; int encerrado = 0; int paused;
 
-void limitarCursor(int *x, int *y) {
-    if (*x <= 1) *x = 1;
-    if (*y <= 1) *y = 1;
-    if (*x >= 620) *x = 620;
-    if (*y >= 461) *y = 461;
+void readButtons() {
+    button0 = ((*KEY_ptr & 0b0001) == 0); // iniciar
+    button1 = ((*KEY_ptr & 0b0010) == 0); // pausar
+    button2 = ((*KEY_ptr & 0b0100) == 0); // parar
 }
 
+// 0100
+// 1111
+// 0100
+// ------
+// 0100
+// 1011
+// 0000
 
-void* detectButton(void* arg) { // talvez nao precisa ser thread
+
+// void* detectButton(void* arg) { // talvez nao precisa ser thread
     
-    int fd = -1; // used to open /dev/mem
-    void *LW_virtual; // virtual address for light-weight bridge
+//     int fd = -1; // used to open /dev/mem
+//     void *LW_virtual; // virtual address for light-weight bridge
 
 
-    // Open /dev/mem to give access to physical addresses
-    if ((fd = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
-        printf("ERROR: could not open \"/dev/mem\"\n");
-        return NULL;
-    }
+//     // Open /dev/mem to give access to physical addresses
+//     if ((fd = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
+//         printf("ERROR: could not open \"/dev/mem\"\n");
+//         return NULL;
+//     }
 
-    // Get a mapping from physical addresses to virtual addresses
-    LW_virtual = mmap(NULL, LW_BRIDGE_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, LW_BRIDGE_BASE);
-     if (LW_virtual == MAP_FAILED) {
-        printf("ERROR: mmap() failed\n");
-        close(fd);
-        return NULL;
-    }
+//     // Get a mapping from physical addresses to virtual addresses
+//     LW_virtual = mmap(NULL, LW_BRIDGE_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, LW_BRIDGE_BASE);
+//      if (LW_virtual == MAP_FAILED) {
+//         printf("ERROR: mmap() failed\n");
+//         close(fd);
+//         return NULL;
+//     }
 
-    // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
-    KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
-    //HEX3_HEX0_BASE_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
-    HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
-    HEX1_ptr = (int *)(LW_virtual + HEX1_BASE);
+//     // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
+//     KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
+//     //HEX3_HEX0_BASE_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
+//     HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
+//     HEX1_ptr = (int *)(LW_virtual + HEX1_BASE);
 
-    while (1) {
+//     while (1) {
         
-        if (*KEY_ptr == 0b0111) {
-            // DA TELA INICIAL PARA O JOGO
-            gameStarted = 1;
-        } 
+//         if (*KEY_ptr == 0b0111) {
+//             // DA TELA INICIAL PARA O JOGO
+//             gameStarted = 1;
+//         } 
 
-        if (*KEY_ptr == 0b1110) {
-            gameStarted = 0;
-            //draw_stop_screen();
-            break;
-        }
+//         if (*KEY_ptr == 0b1110) {
+//             gameStarted = 0;
+//             //draw_stop_screen();
+//             break;
+//         }
 
-        if (*KEY_ptr == 0b1011) {
-            paused = 1;
-            //draw_pause();
-        }
+//         if (*KEY_ptr == 0b1011) {
+//             paused = 1;
+//             //draw_pause();
+//         }
 
-        if (paused == 1 && *KEY_ptr == 0b1011) { // voltar do pause
-            paused = 0;
-        }
+//         if (paused == 1 && *KEY_ptr == 0b1011) { // voltar do pause
+//             paused = 0;
+//         }
 
-        // ============= TESTAR BOTÃO DE PAUSE E DESPAUSE =============
-        //  if (*KEY_ptr == 0b1011) {
-        //     // Se o jogo estiver em andamento e não estiver pausado, pause
-        //     if (gameStarted && !paused) {
-        //         paused = 1;
-        //         usleep(200000); // debounce de 200ms
-        //     } 
-        //     // Se o jogo estiver pausado, despause
-        //     else if (gameStarted && paused) {
-        //         paused = 0;
-        //         usleep(200000); // debounce de 200ms
-        //     }
-        // }
+//         // ============= TESTAR BOTÃO DE PAUSE E DESPAUSE =============
+//         //  if (*KEY_ptr == 0b1011) {
+//         //     // Se o jogo estiver em andamento e não estiver pausado, pause
+//         //     if (gameStarted && !paused) {
+//         //         paused = 1;
+//         //         usleep(200000); // debounce de 200ms
+//         //     } 
+//         //     // Se o jogo estiver pausado, despause
+//         //     else if (gameStarted && paused) {
+//         //         paused = 0;
+//         //         usleep(200000); // debounce de 200ms
+//         //     }
+//         // }
        
-    }
-}
+//     }
+// }
 
 
 
-// Função que será executada na thread
 void* movimentoToupeira(void* arg) {
     void** args = (void**)arg;
 
     Sprite** toupeiras = (Sprite**)args[1];
     Sprite_Fixed** arbustos = (Sprite_Fixed**)args[2];
+
 
     // Sprite* toupeira2 = (Sprite*)args[3];
     // Sprite* toupeira3 = (Sprite*)args[4];
@@ -153,21 +165,38 @@ void* movimentoToupeira(void* arg) {
     // return NULL;
 
     while (1) {
+        // Escuta os botões
 
-        while(gameStarted) {
+        readButtons();
 
-            if (paused) continue;
+        if (button0) {
+            gameStarted = 1;
+            clear_background_block();
+            set_background_color(1, 4, 7);
+        }
+        if (button1) {
+            paused = 0;
+        }
+        if (button2) {
+            gameStarted = 0;
+            break;
+        }
+
+        if (gameStarted && !paused) {
 
             int current_time = time(NULL);
             int i;
             for (i = 0; i < 9; i++) {
+                printf("Toupeira %d: coord_y = %d, direction = %d, moving = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction, toupeiras[i]->moving);
                 if (toupeiras[i]->moving) {
                     // Movimenta a toupeira
                     toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
                     
                     // Verifica se chegou ao limite e inverte a direção
+                    // Ta em cima e desce
                     if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
                         toupeiras[i]->direction = -1;
+                    // Ta embaixo e para
                     } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
                         toupeiras[i]->direction = 1;
                         toupeiras[i]->moving = 0;
@@ -187,7 +216,7 @@ void* movimentoToupeira(void* arg) {
             usleep(300000); // 300ms
         }
 
-        }
+    }
 }
 
 uint8_t display(int number) {
@@ -216,56 +245,64 @@ void* mouse(void* arg) {
     int pontuacao = 0;
     while(1) {
 
-            if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
-                system("clear");
+        if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
+            system("clear");
 
-                x_disp = mouse_buffer[1];
-                y_disp = mouse_buffer[2];
-                leftButton = mouse_buffer[0] & 0x1;
+            x_disp = mouse_buffer[1];
+            y_disp = mouse_buffer[2];
+            leftButton = mouse_buffer[0] & 0x1;
 
-                x += x_disp;
-                y -= y_disp;
+            x += x_disp;
+            y -= y_disp;
 
-                limitarCursor(&x, &y);
-                
-
-                set_sprite(martelo->data_register, x, y, martelo->offset, 1);
-                martelo->coord_x = x;
-                martelo->coord_y = y;
-
-
-                int i;
-                for (i = 0; i < 9; i++) {
-                    if(collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
-                        pontuacao += 1;
-                        //printf("1 ponto");
-                    }
-                }
-
-                printf("Posição X: %d, Posição Y: %d\n", x, y);
-                printf("\nPONTUAÇÃO: %d", pontuacao);
-                //     ======= DISPLAY ========
+            limitarCursor(&x, &y);
             
-            // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
-                int dezena = pontuacao / 10;
-                int unidade = pontuacao % 10;
+
+            set_sprite(martelo->data_register, x, y, martelo->offset, 1);
+            change_coordinate(martelo, x, y);
+            // martelo->coord_x = x;
+            // martelo->coord_y = y;
 
 
-                *HEX0_ptr = display(unidade);
-                *HEX1_ptr = display(dezena);
-
-
-                //printf("botao: %d", *KEY_ptr); // tem logica invertida
-
+            int i;
+            for (i = 0; i < 9; i++) {
+                if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
+                    pontuacao += 1;
+                    //printf("1 ponto");
+                }
             }
-        }
 
-        if (!gameStarted) {
-            pontuacao = 0;
-        }
+            printf("Posição X: %d, Posição Y: %d\n", x, y);
+            printf("\nPONTUAÇÃO: %d", pontuacao);
+            //     ======= DISPLAY ========
+        
+        // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
+        
+            /* Formatação da pontuação pra o display 7*/
+            int dezena = pontuacao / 10;
+            int unidade = pontuacao % 10;
+            int centena = (pontuacao / 100) % 10;
+            int milhar = (pontuacao / 1000) % 10;
 
-        return NULL;
+
+            // *HEX0_ptr = display(unidade);
+            // *HEX1_ptr = display(dezena);
+        
+
+            *HEX3_0_ptr = (display(milhar) << 24) | (display(centena) << 16) | (display(dezena) << 8) | display(unidade);
+
+
+            //printf("botao: %d", *KEY_ptr); // tem logica invertida
+
+        }   
     }
+
+    if (!gameStarted) {
+        pontuacao = 0;
+    }
+
+    return NULL;
+}
 
 void write_sprites() {
 
@@ -297,18 +334,32 @@ void write_sprites() {
 }
 
 
+void draw_initial_screen() {
+    // for........
+    // setbackground..
+    int i;
+    for (i = 0; i < 4800; i++) {
+        int R = initialScreen[i][0];
+        int G = initialScreen[i][1];
+        int B = initialScreen[i][2];
+        set_background_block(i, R, G, B);
+    }
+}
+
 
 int main() {
     pthread_t thread1, thread2, thread3;
 
+    mapPeripherals();
+
     clear_sprite();
     //clear_background_color();
     //clear_background_block();
-    set_background_color(1, 4, 7);
 
-    //draw_initial_screen();
+    draw_initial_screen();
 
 
+/* ============ CRIAÇÃO DE SPRITES ============= */
 
 // primeira linha
     Sprite toupeira1;
@@ -317,7 +368,6 @@ int main() {
     toupeira1.offset = 26;
     toupeira1.data_register = 11;
     toupeira1.ativo = 1;
-    toupeira1.collision = 0;
     toupeira1.direction = 1; // 1 ou -1
     toupeira1.moving = 1;
     toupeira1.min_y = 250;
@@ -329,7 +379,6 @@ int main() {
     toupeira2.offset = 26;
     toupeira2.data_register = 12;
     toupeira2.ativo = 1;
-    toupeira2.collision = 0;
     toupeira2.direction = 1; // 1 ou -1
     toupeira2.moving = 1;
     toupeira2.min_y = 250;
@@ -341,7 +390,6 @@ int main() {
     toupeira3.offset = 26;
     toupeira3.data_register = 13;
     toupeira3.ativo = 1;
-    toupeira3.collision = 0;
     toupeira3.direction = 1; // 1 ou -1
     toupeira3.moving = 1;
     toupeira3.min_y = 250;
@@ -354,7 +402,6 @@ int main() {
     toupeira4.offset = 26;
     toupeira4.data_register = 14;
     toupeira4.ativo = 1;
-    toupeira4.collision = 0;
     toupeira4.direction = 1; // 1 ou -1
     toupeira4.moving = 1;
     toupeira4.min_y = 300;
@@ -366,7 +413,6 @@ int main() {
     toupeira5.offset = 26;
     toupeira5.data_register = 15;
     toupeira5.ativo = 1;
-    toupeira5.collision = 0;
     toupeira5.direction = 1; // 1 ou -1
     toupeira5.moving = 1;
     toupeira5.min_y = 300;
@@ -378,7 +424,6 @@ int main() {
     toupeira6.offset = 26;
     toupeira6.data_register = 16;
     toupeira6.ativo = 1;
-    toupeira6.collision = 0;
     toupeira6.direction = 1; // 1 ou -1
     toupeira6.moving = 1;
     toupeira6.min_y = 300;
@@ -390,7 +435,6 @@ int main() {
     toupeira7.offset = 26;
     toupeira7.data_register = 17;
     toupeira7.ativo = 1;
-    toupeira7.collision = 0;
     toupeira7.direction = 1; // 1 ou -1
     toupeira7.moving = 1;
     toupeira7.min_y = 350;
@@ -402,7 +446,6 @@ int main() {
     toupeira8.offset = 26;
     toupeira8.data_register = 18;
     toupeira8.ativo = 1;
-    toupeira8.collision = 0;
     toupeira8.direction = 1; // 1 ou -1
     toupeira8.moving = 1;
     toupeira8.min_y = 350;
@@ -414,7 +457,7 @@ int main() {
     toupeira9.offset = 26;
     toupeira9.data_register = 19;
     toupeira9.ativo = 1;
-    toupeira9.collision = 0;
+    toupeira9 ;
     toupeira9.direction = 1; // 1 ou -1
     toupeira9.moving = 1;
     toupeira9.min_y = 350;
@@ -527,15 +570,9 @@ int main() {
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
 
-    // Cria as threads
-
-    if (pthread_create(&thread3, NULL, detectButton, NULL) != 0) {
-        perror("Failed to create thread 3");
-        return 1;
-    }
+/*============== CRIAÇÃO DE THREADS ================== */
 
 
-   // while(!gameStarted) {}
 
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
         perror("Failed to create thread 1");
@@ -556,48 +593,13 @@ int main() {
     }
     //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
 
-    if (pthread_join(thread3, NULL) != 0) {
-        perror("Failed to join thread 3");
-        return 1;
-    }
+    // if (pthread_join(thread3, NULL) != 0) {
+    //     perror("Failed to join thread 3");
+    //     return 1;
+    // }
 
 
     return 0;
 }
-
-
-// void* movimentoToupeira(void* arg) {
-    
-//     int max_y = 200;
-//     int min_y = 150;
-
-//     while (1) {
-//         int current_time = time(NULL);
-//         for (int i = 0; i < 9; i++) {
-//             if (toupeiras[i].moving) {
-//                 // Movimenta a toupeira
-//                 toupeiras[i]->coord_y += toupeiras[i]->direction * 5;
-                
-//                 // Verifica se chegou ao limite e inverte a direção
-//                 if (toupeiras[i]->coord_y >= toupeiras[i].max_y) {
-//                     toupeiras[i]->direction = -1;
-//                 } else if (toupeiras[i]->coord_y <= toupeiras[i].min_y) {
-//                     toupeiras[i]->direction = 1;
-//                     toupeiras[i].moving = 0; // Para a toupeira de se mover
-//                     toupeiras[i].last_update = current_time; // Atualiza o tempo da última parada
-//                 }
-
-//                 // Atualiza o sprite
-//                 set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
-//             } else if (current_time - toupeiras[i].last_update >= toupeiras[i].interval) {
-//                 // Define um novo intervalo aleatório
-//                 toupeiras[i].interval = rand() % 5 + 1;
-//                 toupeiras[i].moving = 1; // Retoma o movimento da toupeira
-//             }
-//         }
-//         usleep(50000); // 50ms
-//     }
-//     return NULL;
-// }
 
 

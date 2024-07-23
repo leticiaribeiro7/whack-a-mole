@@ -7,7 +7,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/uaccess.h>
-#include "./address_map_arm.h"
+#include "headers/address_map_arm.h"
 
 #define MAX_SIZE     32
 #define BASE_MINOR   71
@@ -174,7 +174,7 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
 
     int values[MAX_SIZE];
     int instruction = 0;
-    int i = 0;
+
     while (*wrfull_ptr) {} /*Aguarda a fila esvaziar antes de mandar novas instruções*/
 
     /*Copia os dados do buffer do usuário para a mensagem*/
@@ -267,7 +267,7 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     R &= 0x7;
     G &= 0x7;
     B &= 0x7;
-    endereco_memoria &= 0xFFF; // 12 bits
+    endereco_memoria &= 0x1FFF; // 13 bits
     
     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
     *data_b_ptr = (B << 6) | (G << 3) | R;
