@@ -21,6 +21,7 @@ extern volatile int* KEY_ptr;
 
 int button0, button1, button2;
 int gameStarted = 0; int paused = 0;
+int state = 0; // pra acontecer as trocas de tela de acordo ao estado
 
 int segmentos[10] = {
     0b1000000,
@@ -169,16 +170,26 @@ void* movimentoToupeira(void* arg) {
 
         readButtons();
 
-        if (button0) {
-            gameStarted = 1;
+        if (button0 && state == 0) { // inicia se ainda nao tiver iniciado
+            gameStarted = state = 1; // rodando
             clear_background_block();
             set_background_color(1, 4, 7);
         }
-        if (button1) {
+
+        if (button1 && state == 1) { // so pausa se tiver rodando
+            paused = 0;
+            state = 2; //pausado
+        }
+
+        if (button1 & state == 2) { // retorna da pausa se tiver pausado
             paused = 0;
         }
-        if (button2) {
+
+        if (button2) { // encerra em qualquer state
             gameStarted = 0;
+            state = 3; //encerrado
+            clear_background_block();
+            //draw_stop_screen();
             break;
         }
 
