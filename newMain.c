@@ -5,21 +5,18 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include <stdint.h>
-
 // #include "headers/screens.h"
 #include "headers/utils.h"
 #include "headers/spritesRGB.h"
-#include "headers/screensRGB.h"
 #include "headers/graphics_processor.h"
 #include "headers/address_map_arm.h"
-
 #define MOUSEFILE "/dev/input/mice"
-#define GAME_DURATION 45
+#include "headers/screensRGB.h"
+
+
 
 extern volatile int* HEX0_ptr;
 extern volatile int* HEX1_ptr;
-extern volatile int* HEX2_ptr;
-extern volatile int* HEX3_ptr;
 extern volatile int* HEX3_0_ptr;
 extern volatile int* KEY_ptr;
 
@@ -28,6 +25,7 @@ int gameStarted = 0; int paused = 0; int lido = 0;
 int state = 0; // pra acontecer as trocas de tela de acordo ao estado
 
 int segmentos[10] = {
+  
     0b1000000,
     0b1111001,
     0b0100100,
@@ -39,7 +37,6 @@ int segmentos[10] = {
     0b0000000,
     0b0010000
 };
-
 
 void readButtons() {
     button0 = ((*KEY_ptr & 0b0001) == 0); // iniciar
@@ -71,45 +68,6 @@ void draw_game_screen() {
 
 
 
-//     while (1) {
-        
-//         if (*KEY_ptr == 0b0111) {
-//             // DA TELA INICIAL PARA O JOGO
-//             gameStarted = 1;
-//         } 
-
-//         if (*KEY_ptr == 0b1110) {
-//             gameStarted = 0;
-//             //draw_stop_screen();
-//             break;
-//         }
-
-//         if (*KEY_ptr == 0b1011) {
-//             paused = 1;
-//             //draw_pause();
-//         }
-
-//         if (paused == 1 && *KEY_ptr == 0b1011) { // voltar do pause
-//             paused = 0;
-//         }
-
-//         // ============= TESTAR BOTÃO DE PAUSE E DESPAUSE =============
-//         //  if (*KEY_ptr == 0b1011) {
-//         //     // Se o jogo estiver em andamento e não estiver pausado, pause
-//         //     if (gameStarted && !paused) {
-//         //         paused = 1;
-//         //         usleep(2000]00); // debounce de 200ms
-//         //     } 
-//         //     // Se o jogo estiver pausado, despause
-//         //     else if (gameStarted && paused) {
-//         //         paused = 0;
-//         //         usleep(200000); // debounce de 200ms
-//         //     }
-//         // }
-       
-//     }
-// }
-
 
 
 void* movimentoToupeira(void* arg) {
@@ -119,40 +77,28 @@ void* movimentoToupeira(void* arg) {
     Sprite_Fixed** arbustos = (Sprite_Fixed**)args[2];
 
 
-    // Sprite* toupeira2 = (Sprite*)args[3];
-    // Sprite* toupeira3 = (Sprite*)args[4];
-    // Sprite* toupeira4 = (Sprite*)args[5];
-    // Sprite* toupeira5 = (Sprite*)args[6];
-
-    time_t current_time = 0; // atual (sempre atualizado)
-    time_t start_time = 0; // inicio do jogo
-    time_t total_paused_time = 0; // Tempo total em que o jogo esteve pausado
-    time_t pause_start_time = 0; // Tempo em que o jogo foi pausado
-    time_t elapsed_time = 0; // Tempo decorrido do jogo
-
     while (1) {
-
-        current_time = time(NULL);
-
         // Escuta os botões
         readButtons();
 
         if (button0 && state == 0) { // inicia se ainda nao tiver iniciado
-            //clear_background_block();
+           // clear_background_block();
+            
             draw_game_screen();
             gameStarted = 1;
             state = 1; // rodando
-            time_t start_time = time(NULL);
-        }
-         
-        if (button1 && state == 1) { // so pausa se tiver rodando
-            paused = 1;
-            state = 2; //pausado
-            lido = 1;
-            pause_start_time = current_time;   
+            printf("primeiro if %d\n", state);
         }
 
-        while (button1) { // aguarda o botão de pausa ser solto
+        if (button1 && state == 1) { // so pausa se tiver rodando
+            paused = 1;
+            //printf("paused %d", paused);
+            state = 2; //pausado
+            lido = 1;
+
+        }
+
+        while (button1) {
             readButtons();
         }
 
@@ -161,7 +107,6 @@ void* movimentoToupeira(void* arg) {
         if (button1 && state == 2) { // retorna da pausa se tiver pausado
             paused = 0;
             state = 1;
-            total_paused_time += current_time - pause_start_time; // tempo total de pause, se pausar + de 1 vez
         }
 
 
@@ -173,16 +118,9 @@ void* movimentoToupeira(void* arg) {
             break;
         }
 
-    
-        
-        if (gameStarted && paused == 0) {
 
-            elapsed_time = current_time - start_time - total_paused_time; // tempo decorrido: tempo atual - tempo que começou - tempo de pausa
-            // Verifica se o tempo de execução do jogo foi atingido
-            if (elapsed_time >= GAME_DURATION) {
-                printf("Tempo de jogo expirado\n");
-                break;
-            }
+
+        if (gameStarted && paused == 0) {
 
             int current_time = time(NULL);
             int i;
@@ -191,13 +129,13 @@ void* movimentoToupeira(void* arg) {
                 if (toupeiras[i]->moving) {
                     // Movimenta a toupeira
                     toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
-                    
+
                     // Verifica se chegou ao limite e inverte a direção
                     // Ta em cima e desce
-                    if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) { // <=min
+                    if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
                         toupeiras[i]->direction = -1;
                     // Ta embaixo e para
-                    } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) { //>= max
+                    } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
                         toupeiras[i]->direction = 1;
                         toupeiras[i]->moving = 0;
                         toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
@@ -209,28 +147,26 @@ void* movimentoToupeira(void* arg) {
                     // Atualiza o sprite
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                     // Define um novo intervalo aleatório
-                    toupeiras[i]->interval = rand() % 3 + 1;
+                    toupeiras[i]->interval = rand() % 2 + 1;
                     toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
-                    printf("Toupeira %d retoma movimento com intervalo %d\n", i, toupeiras[i]->interval);
                 }
             }
             usleep(200000); // 200ms
-
         }
-
 
     }
 }
 
 uint8_t display(int number) {
-    return segmentos[number];
+    uint8_t segmentos_map = segmentos[number];
+    return segmentos_map;
 }
 
 void* mouse(void* arg) {
     void** args = (void**)arg;
     Sprite_Fixed* martelo = (Sprite_Fixed*)args[0];
     Sprite** toupeiras = (Sprite**)args[1];
-    
+
 
     int fd;
     int x = 0, y = 0;
@@ -258,7 +194,7 @@ void* mouse(void* arg) {
             y -= y_disp;
 
             limitarCursor(&x, &y);
-            
+
 
             set_sprite(martelo->data_register, x, y, martelo->offset, 1);
             change_coordinate(martelo, x, y);
@@ -277,9 +213,9 @@ void* mouse(void* arg) {
             printf("Posição X: %d, Posição Y: %d\n", x, y);
             printf("\nPONTUAÇÃO: %d", pontuacao);
             //     ======= DISPLAY ========
-        
+
         // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
-        
+
             /* Formatação da pontuação pra o display 7*/
             int dezena = pontuacao / 10;
             int unidade = pontuacao % 10;
@@ -289,17 +225,12 @@ void* mouse(void* arg) {
 
             *HEX0_ptr = display(unidade);
             *HEX1_ptr = display(dezena);
-            *HEX2_ptr = display(centena);
-            *HEX3_ptr = display(milhar);
-        
+
 
             //*HEX3_0_ptr = (display(milhar) << 0x24) | (display(centena) << 0x16) | (display(dezena) << 0x8) | display(unidade);
 
 
             //printf("botao: %d", *KEY_ptr); // tem logica invertida
-            if (state == 3) {
-                break;
-            }
 
         }   
     }
@@ -357,16 +288,44 @@ void draw_initial_screen() {
 
 
 int main() {
-    pthread_t thread1, thread2;
+   pthread_t thread1, thread2;
 
     mapPeripherals();
 
     clear_sprite();
-    //set_background_color(1, 4, 7);
+
+    //set_background_color(1, 5, 5);
     //clear_background_color();
     //clear_background_block();
 
     draw_initial_screen();
+
+
+        // Grava martelo
+    int i;
+    for (i = 0; i < 380; i++) {
+        int R = marteloSp[i][0];
+        int G = marteloSp[i][1];
+        int B = marteloSp[i][2];
+        int endereco_memoria = 10000 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = toupeiraSp[i][0];
+        int G = toupeiraSp[i][1];
+        int B = toupeiraSp[i][2];
+        int endereco_memoria = 10400 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
+
+    for (i = 0; i < 400; i++) {
+        int R = arbustoSp[i][0];
+        int G = arbustoSp[i][1];
+        int B = arbustoSp[i][2];
+        int endereco_memoria = 10800 + i;
+        write_sprite_mem(R, G, B, endereco_memoria);
+    }
 
 
 /* ============ CRIAÇÃO DE SPRITES ============= */
@@ -560,7 +519,7 @@ int main() {
     arbusto9.offset = 27;
     arbusto9.ativo = 1;
     arbusto9.data_register = 10; 
-    
+
     Sprite_Fixed* arbustos[9] = {
         &arbusto1,
         &arbusto2,
@@ -575,21 +534,18 @@ int main() {
 
 // menor reg fica em cima
 
-    //write_sprites()
-
+    //write_sprites();
 
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
-
+    
+    
+  
 /*============== CRIAÇÃO DE THREADS ================== */
-
-
-
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
         perror("Failed to create thread 1");
         return 1;
     }
-
     if (pthread_create(&thread2, NULL, mouse, (void*)args) != 0) {
         perror("Failed to create thread 2");
         return 1;
@@ -603,14 +559,10 @@ int main() {
         return 1;
     }
     //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
-
     // if (pthread_join(thread3, NULL) != 0) {
     //     perror("Failed to join thread 3");
     //     return 1;
     // }
 
-
     return 0;
 }
-
-
