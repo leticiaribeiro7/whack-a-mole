@@ -8,6 +8,8 @@
 volatile int* KEY_ptr;
 volatile int* HEX0_ptr; 
 volatile int* HEX1_ptr;
+volatile int* HEX2_ptr;
+volatile int* HEX3_ptr;
 volatile int* HEX3_0_ptr;
 
 void mapPeripherals() {
@@ -35,6 +37,9 @@ void mapPeripherals() {
     HEX3_0_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
     HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
     HEX1_ptr = (int *)(LW_virtual + HEX1_BASE);
+    HEX2_ptr = (int *)(LW_virtual + HEX2_BASE);
+    HEX3_ptr = (int *)(LW_virtual + HEX3_BASE);
+
 
 }
 

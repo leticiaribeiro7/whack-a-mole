@@ -7,6 +7,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/uaccess.h>
+#include <stdint.h>
 #include "headers/address_map_arm.h"
 
 #define MAX_SIZE     32
@@ -238,17 +239,20 @@ static void escrita_buffer(void) {
  * \return 1 se a operação foi bem sucedida
  */
 static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offset, int sp) {
-    // Limitar R, G e B a 3 bits
-    R &= 0x7;
-    G &= 0x7;
-    B &= 0x7;
 
-    *data_a_ptr = (reg << 4) | OPCODE_WBR;
+    uint32_t data_b_value;
+    
+    uint32_t data_a_value = ((reg & 0x1F) << 4) | OPCODE_WBR;
+    //*data_a_ptr = ((reg & 0x1F) << 4) | OPCODE_WBR;
     if (sp) {
-        *data_b_ptr = (sp << 29) | (x << 19) | (y << 9) | offset;
+        data_b_value = ((sp & 0x1) << 29) | ((x & 0x3FF) << 19) | ((y & 0x3FF)<< 9) | (offset & 0x1FF);
     } else {
-        *data_b_ptr = (B << 6) | (G << 3) | R;
+        data_b_value = ((B & 0x7) << 6) | ((G & 0x7) << 3) | (R & 0x7);
     }
+
+    *data_a_ptr = data_a_value;
+    *data_b_ptr = data_b_value;
+
     escrita_buffer();
     return 1;
 }
@@ -262,19 +266,40 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
  * \param[in] B : Componente azul
  * \return 1 se a operação foi bem-sucedida
  */
+// static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
+//     // Limitar R, G e B a 3 bits
+//     R &= 0x7;
+//     G &= 0x7;
+//     B &= 0x7;
+//     endereco_memoria &= 0x1FFF; // 13 bits
+    
+//     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
+//     *data_b_ptr = (B << 6) | (G << 3) | R;
+    
+//     escrita_buffer();
+//     return 1;
+// }
+
 static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     // Limitar R, G e B a 3 bits
-    R &= 0x7;
-    G &= 0x7;
-    B &= 0x7;
-    endereco_memoria &= 0x1FFF; // 13 bits
     
-    *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
-    *data_b_ptr = (B << 6) | (G << 3) | R;
+    // Limitar endereco_memoria a 13 bits
     
+    uint32_t data_a_value = ((endereco_memoria & 0x1FFF) << 4) | OPCODE_WBM;
+    uint32_t data_b_value = ((B & 0x7) << 6) | ((G & 0x7) << 3) | (R & 0x7);
+
+    // printf("Data A: 0x%X\n", data_a_value);
+    // printf("Data B: 0x%X\n", data_b_value);
+
+    *data_a_ptr = data_a_value;
+    *data_b_ptr = data_b_value;
+    
+    // Chamar a função de escrita no buffer
     escrita_buffer();
+
     return 1;
 }
+
 
 /**
  * \brief Instrução para desenho de poligono no processador gráfico

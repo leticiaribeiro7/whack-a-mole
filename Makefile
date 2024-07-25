@@ -1,5 +1,4 @@
 obj-m += graphics_processor_module.o
-obj-m += buttons_interrupt.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 
