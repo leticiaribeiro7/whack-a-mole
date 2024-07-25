@@ -14,6 +14,7 @@
 #include "headers/address_map_arm.h"
 
 #define MOUSEFILE "/dev/input/mice"
+#define GAME_DURATION 45
 
 extern volatile int* HEX0_ptr;
 extern volatile int* HEX1_ptr;
@@ -123,8 +124,16 @@ void* movimentoToupeira(void* arg) {
     // Sprite* toupeira4 = (Sprite*)args[5];
     // Sprite* toupeira5 = (Sprite*)args[6];
 
+    time_t current_time = 0; // atual (sempre atualizado)
+    time_t start_time = 0; // inicio do jogo
+    time_t total_paused_time = 0; // Tempo total em que o jogo esteve pausado
+    time_t pause_start_time = 0; // Tempo em que o jogo foi pausado
+    time_t elapsed_time = 0; // Tempo decorrido do jogo
 
     while (1) {
+
+        current_time = time(NULL);
+
         // Escuta os botões
         readButtons();
 
@@ -133,13 +142,14 @@ void* movimentoToupeira(void* arg) {
             draw_game_screen();
             gameStarted = 1;
             state = 1; // rodando
+            time_t start_time = time(NULL);
         }
          
         if (button1 && state == 1) { // so pausa se tiver rodando
             paused = 1;
             state = 2; //pausado
             lido = 1;
-            
+            pause_start_time = current_time;   
         }
 
         while (button1) { // aguarda o botão de pausa ser solto
@@ -151,6 +161,7 @@ void* movimentoToupeira(void* arg) {
         if (button1 && state == 2) { // retorna da pausa se tiver pausado
             paused = 0;
             state = 1;
+            total_paused_time += current_time - pause_start_time; // tempo total de pause, se pausar + de 1 vez
         }
 
 
@@ -165,6 +176,13 @@ void* movimentoToupeira(void* arg) {
     
         
         if (gameStarted && paused == 0) {
+
+            elapsed_time = current_time - start_time - total_paused_time; // tempo decorrido: tempo atual - tempo que começou - tempo de pausa
+            // Verifica se o tempo de execução do jogo foi atingido
+            if (elapsed_time >= GAME_DURATION) {
+                printf("Tempo de jogo expirado\n");
+                break;
+            }
 
             int current_time = time(NULL);
             int i;
@@ -197,7 +215,9 @@ void* movimentoToupeira(void* arg) {
                 }
             }
             usleep(200000); // 200ms
+
         }
+
 
     }
 }
