@@ -7,7 +7,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/uaccess.h>
-#include <stdint.h>
+// #include <stdint.h>
 #include "headers/address_map_arm.h"
 
 #define MAX_SIZE     32
@@ -290,6 +290,7 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
 
     // printf("Data A: 0x%X\n", data_a_value);
     // printf("Data B: 0x%X\n", data_b_value);
+
 
     *data_a_ptr = data_a_value;
     *data_b_ptr = data_b_value;
