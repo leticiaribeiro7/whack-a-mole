@@ -23,6 +23,8 @@ extern volatile int* KEY_ptr;
 int button0, button1, button2;
 int gameStarted = 0; int paused = 0; int lido = 0;
 int state = 0; // pra acontecer as trocas de tela de acordo ao estado
+int pontuacao = 0;
+
 
 int segmentos[10] = {
   
@@ -76,10 +78,21 @@ void* movimentoToupeira(void* arg) {
     Sprite** toupeiras = (Sprite**)args[1];
     Sprite_Fixed** arbustos = (Sprite_Fixed**)args[2];
 
+    srand(time(NULL));
+
+    int start_time = 0;
+    int pause_time = 0;
+    int total_pause_time = 0;
+    int last_check_time = 0;
+
+    uint16_t base_block_address = 950; // teste
+
+    start_time = time(NULL);
+    last_check_time = time(NULL);
 
     while (1) {
         // Escuta os botões
-        readButtons();
+       // readButtons();
 
         if (button0 && state == 0) { // inicia se ainda nao tiver iniciado
            // clear_background_block();
@@ -87,15 +100,13 @@ void* movimentoToupeira(void* arg) {
             draw_game_screen();
             gameStarted = 1;
             state = 1; // rodando
-            printf("primeiro if %d\n", state);
         }
 
         if (button1 && state == 1) { // so pausa se tiver rodando
             paused = 1;
             //printf("paused %d", paused);
             state = 2; //pausado
-            lido = 1;
-
+            pause_time = time(NULL);
         }
 
         while (button1) {
@@ -107,6 +118,7 @@ void* movimentoToupeira(void* arg) {
         if (button1 && state == 2) { // retorna da pausa se tiver pausado
             paused = 0;
             state = 1;
+            total_pause_time += time(NULL) - pause_time;
         }
 
 
@@ -125,10 +137,12 @@ void* movimentoToupeira(void* arg) {
             int current_time = time(NULL);
             int i;
             for (i = 0; i < 9; i++) {
-                //printf("Toupeira %d: coord_y = %d, direction = %d, moving = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction, toupeiras[i]->moving);
+                printf("Processando toupeira %d\n", i);
+                printf("Toupeira %d: coord_y = %d, direction = %d, moving = %d, last_update = %d, interval = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction, toupeiras[i]->moving, toupeiras[i]->last_update, toupeiras[i]->interval);                
                 if (toupeiras[i]->moving) {
                     // Movimenta a toupeira
                     toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
+                    toupeiras[i]->interval = rand() % 3 + 1; // entre 1 e 3 seg
 
                     // Verifica se chegou ao limite e inverte a direção
                     // Ta em cima e desce
@@ -143,17 +157,35 @@ void* movimentoToupeira(void* arg) {
                     set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
                     set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
 
-                    //printf("toupeira numero %d\n", i);
+                    //printf("Toupeira %d movendo para coord_y = %d, direction = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction);
                     // Atualiza o sprite
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                     // Define um novo intervalo aleatório
-                    toupeiras[i]->interval = rand() % 2 + 1;
                     toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
+                    printf("Toupeira %d retoma movimento com novo intervalo = %d\n", i, toupeiras[i]->interval);
                 }
+                readButtons();
             }
-            usleep(200000); // 200ms
-        }
 
+            if (pontuacao < 25) {
+                usleep(250000); // 250ms
+            } else if (pontuacao < 50) {
+                usleep(150000); // 150 ms
+            } // mov mais rapido com maior pontuação
+
+            if ((current_time - last_check_time) >= 5) {
+                printf("Verificação a cada 5 segundos: %d segundos decorridos\n", current_time - start_time - total_pause_time);
+                set_background_block(base_block_address, 7, 1, 1);
+                base_block_address -= 1;
+                last_check_time = current_time; // Atualiza o tempo da última verificação
+            } // cada 5 seg
+
+            if ((current_time - start_time - total_pause_time) >= 45) {
+                printf("%s", "acabou");
+                //draw jogo encerrado
+                break;
+            }
+        }
     }
 }
 
@@ -161,6 +193,16 @@ uint8_t display(int number) {
     uint8_t segmentos_map = segmentos[number];
     return segmentos_map;
 }
+
+
+// Condições pra incrementar a pontuação
+int increment_score(int leftButton, Sprite* toupeira, Sprite_Fixed* martelo) {
+    return collision(toupeira, martelo) &&
+    leftButton && 
+    toupeira->coord_y < toupeira->max_y && // toupeira fora do arbusto
+    !paused;
+}
+
 
 void* mouse(void* arg) {
     void** args = (void**)arg;
@@ -180,7 +222,7 @@ void* mouse(void* arg) {
         exit(EXIT_FAILURE);
     }
 
-    int pontuacao = 0;
+    // int pontuacao = 0;
     while(1) {
 
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
@@ -204,14 +246,18 @@ void* mouse(void* arg) {
 
             int i;
             for (i = 0; i < 9; i++) {
-                if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
-                    pontuacao += 1;
-                    //printf("1 ponto");
-                }
+                // if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y && !paused) {
+                //     pontuacao += 1;
+                    if (increment_score(leftButton, toupeiras[i], martelo)) {
+                        pontuacao += 1;
+                    }
+
+
+               // }
             }
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
-            printf("\nPONTUAÇÃO: %d", pontuacao);
+            printf("PONTUAÇÃO: %d\n", pontuacao);
             //     ======= DISPLAY ========
 
         // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
@@ -225,6 +271,7 @@ void* mouse(void* arg) {
 
             *HEX0_ptr = display(unidade);
             *HEX1_ptr = display(dezena);
+            //*HEX2_ptr = display(centena);
 
 
             //*HEX3_0_ptr = (display(milhar) << 0x24) | (display(centena) << 0x16) | (display(dezena) << 0x8) | display(unidade);
@@ -235,7 +282,7 @@ void* mouse(void* arg) {
         }   
     }
 
-    if (!gameStarted) {
+    if (state == 3) {
         pontuacao = 0;
     }
 
