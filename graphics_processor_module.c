@@ -7,13 +7,15 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/uaccess.h>
-// #include <stdint.h>
+#include <asm/io.h>
+#include <linux/types.h>
+
 #include "headers/address_map_arm.h"
 
 #define MAX_SIZE     32
 #define BASE_MINOR   71
 #define DEVICE_COUNT 1
-#define DEVICE_NAME  "graphicProcessor"
+#define DEVICE_NAME  "graphic_processor"
 
 #define OPCODE_WBR   0b0000
 #define OPCODE_WBM   0b0010
@@ -24,7 +26,7 @@
 #define DP           3
 #define WSM          4
 
-void* LW_virtual;
+void __iomem *LW_virtual;
 volatile int* data_a_ptr; /*Ponteiro para registrador de dados A */
 volatile int* data_b_ptr; /*Ponteiro para registrador de dados B */
 volatile int* wrreg_ptr; /* Ponteiro para registrador de escrita */
@@ -89,13 +91,13 @@ static int __init iniciar(void) {
     device_create(class, NULL, device_number, NULL, DEVICE_NAME);
 
     
-    LW_virtual = ioremap_nocache(LW_BRIDGE_BASE, LW_BRIDGE_SPAN);/*Mapeamento de memória entrada e saida I/O*/
+    LW_virtual = ioremap(LW_BRIDGE_BASE, LW_BRIDGE_SPAN);/*Mapeamento de memória entrada e saida I/O*/
 
     /*Inicialização dos ponteiros para registradores*/
-    data_a_ptr = (int*)(LW_virtual + DATA_A_BASE);
-    data_b_ptr = (int*)(LW_virtual + DATA_B_BASE);
-    wrreg_ptr = (int*)(LW_virtual + WRREG_BASE);
-    wrfull_ptr = (int*)(LW_virtual + WRFULL);
+    data_a_ptr = (volatile int*)(LW_virtual + DATA_A_BASE);
+    data_b_ptr = (volatile int*)(LW_virtual + DATA_B_BASE);
+    wrreg_ptr = (volatile int*)(LW_virtual + WRREG_BASE);
+    wrfull_ptr = (volatile int*)(LW_virtual + WRFULL);
 
    // printk(KERN_INFO "Driver carregado no sistema\n");
 
@@ -116,8 +118,6 @@ static void __exit parar(void) {
     cdev_del(&cdev);
     unregister_chrdev_region(device_number, DEVICE_COUNT);
     iounmap(LW_virtual);
-
-   // printk(KERN_INFO "Driver removido do sistema\n");
 }
 
 /**
@@ -128,7 +128,6 @@ static void __exit parar(void) {
  * \return 0 se a abertura foi bem sucedida
  */
 static int device_open(struct inode* inode, struct file* file) {
-    //printk(KERN_INFO "Arquivo aberto no espaço do usuário\n");
     return 0;
 }
 
@@ -140,7 +139,6 @@ static int device_open(struct inode* inode, struct file* file) {
  * \return 0 quando o arquivo é fechado
  */
 static int device_release(struct inode* inode, struct file* file) {
-    //printk(KERN_INFO "Arquivo fechado\n");
     return 0;
 }
 
@@ -221,8 +219,10 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
  * indicando que os dados estão prontos para serem processados
  */
 static void escrita_buffer(void) {
-    *wrreg_ptr = 1;
-    *wrreg_ptr = 0;
+    iowrite32(1, wrreg_ptr);
+    iowrite32(0, wrreg_ptr);
+    // *wrreg_ptr = 1;
+    // *wrreg_ptr = 0;
 }
 
 /**
@@ -240,9 +240,9 @@ static void escrita_buffer(void) {
  */
 static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offset, int sp) {
 
-    uint32_t data_b_value;
+    u32 data_b_value;
     
-    uint32_t data_a_value = ((reg & 0x1F) << 4) | OPCODE_WBR;
+    u32 data_a_value = ((reg & 0x1F) << 4) | OPCODE_WBR;
     //*data_a_ptr = ((reg & 0x1F) << 4) | OPCODE_WBR;
     if (sp) {
         data_b_value = ((sp & 0x1) << 29) | ((x & 0x3FF) << 19) | ((y & 0x3FF)<< 9) | (offset & 0x1FF);
@@ -250,8 +250,11 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
         data_b_value = ((B & 0x7) << 6) | ((G & 0x7) << 3) | (R & 0x7);
     }
 
-    *data_a_ptr = data_a_value;
-    *data_b_ptr = data_b_value;
+    // *data_a_ptr = data_a_value;
+    // *data_b_ptr = data_b_value;
+
+    iowrite32(data_a_value, data_a_ptr);
+    iowrite32(data_b_value, data_b_ptr);
 
     escrita_buffer();
     return 1;
@@ -266,35 +269,24 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
  * \param[in] B : Componente azul
  * \return 1 se a operação foi bem-sucedida
  */
-// static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
-//     // Limitar R, G e B a 3 bits
-//     R &= 0x7;
-//     G &= 0x7;
-//     B &= 0x7;
-//     endereco_memoria &= 0x1FFF; // 13 bits
-    
-//     *data_a_ptr = (endereco_memoria << 4) | OPCODE_WBM;
-//     *data_b_ptr = (B << 6) | (G << 3) | R;
-    
-//     escrita_buffer();
-//     return 1;
-// }
 
 static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     // Limitar R, G e B a 3 bits
     
     // Limitar endereco_memoria a 13 bits
     
-    uint32_t data_a_value = ((endereco_memoria & 0x1FFF) << 4) | OPCODE_WBM;
-    uint32_t data_b_value = ((B & 0x7) << 6) | ((G & 0x7) << 3) | (R & 0x7);
+    u32 data_a_value = ((endereco_memoria & 0x1FFF) << 4) | OPCODE_WBM;
+    u32 data_b_value = ((B & 0x7) << 6) | ((G & 0x7) << 3) | (R & 0x7);
 
     // printf("Data A: 0x%X\n", data_a_value);
     // printf("Data B: 0x%X\n", data_b_value);
 
 
-    *data_a_ptr = data_a_value;
-    *data_b_ptr = data_b_value;
+    // *data_a_ptr = data_a_value;
+    // *data_b_ptr = data_b_value;
     
+    iowrite32(data_a_value, data_a_ptr);
+    iowrite32(data_b_value, data_b_ptr);
     // Chamar a função de escrita no buffer
     escrita_buffer();
 
@@ -321,8 +313,12 @@ static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, in
     G &= 0x7;
     B &= 0x7;
 
-    *data_a_ptr = (endereco << 4) | OPCODE_DP;
-    *data_b_ptr = (forma << 31) | (B << 28) | (G << 25) | (R << 22) | (tamanho << 18) | (y << 9) | x;
+    u32 data_a_value = (endereco << 4) | OPCODE_DP;
+    u32 data_b_value = (forma << 31) | (B << 28) | (G << 25) | (R << 22) | (tamanho << 18) | (y << 9) | x;
+
+    iowrite32(data_a_value, data_a_ptr);
+    iowrite32(data_b_value, data_b_ptr);
+
     escrita_buffer();
     return 1;
 }
@@ -342,8 +338,11 @@ static int instruction_WSM(int R, int G, int B, int endereco_memoria) {
     G &= 0x7;
     B &= 0x7;
 
-    *data_a_ptr = (endereco_memoria << 4) | OPCODE_WSM;
-    *data_b_ptr = (B << 6) | (G << 3) | R;
+    u32 data_a_value = (endereco_memoria << 4) | OPCODE_WSM;
+    u32 data_b_value = (B << 6) | (G << 3) | R;
+
+    iowrite32(data_a_value, data_a_ptr);
+    iowrite32(data_b_value, data_b_ptr);
 
     escrita_buffer();
     return 1;

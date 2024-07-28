@@ -57,7 +57,7 @@ typedef struct {
  * \param[in] activation_bit : Estado de ativação do sprite
  * \return  1 caso operação seja bem sucedida, e 0 caso contrário
 */
-void set_sprite(int registrador, int x, int y, int offset, int activation_bit);
+void set_sprite(uint8_t reg, uint16_t x, uint16_t y, uint16_t offset, uint8_t activation_bit);
 
 /**
  * \brief Modelar o background através de preenchimento dos blocos.
@@ -68,7 +68,7 @@ void set_sprite(int registrador, int x, int y, int offset, int activation_bit);
  * \param[in] B : Componente da cor azul.
  * \return          1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-void set_background_block(int endereco_memoria, int R, int G, int B);
+void set_background_block(uint16_t endereco_memoria, uint8_t R, uint8_t G, uint8_t B);
 
 /**
  * \brief Configura a cor base do background.
@@ -78,7 +78,7 @@ void set_background_block(int endereco_memoria, int R, int G, int B);
  * \param[in] B : Componente da cor azul.
  * \return    1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-void set_background_color(int R, int G, int B);
+void set_background_color(uint8_t R, uint8_t G, uint8_t B);
 
 /**
  * \brief Posicionar um polígono na tela.
@@ -93,7 +93,7 @@ void set_background_color(int R, int G, int B);
  * \param[in] endereco : Endereço de memória onde o polígono será armazenado.
  * \return    1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-void define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, int endereco);
+void define_poligon(uint8_t forma, uint8_t R, uint8_t G, uint8_t B, uint8_t tamanho, uint16_t x, uint16_t y, uint8_t endereco);
 
 /**
  * \brief Define um novo sprite.
@@ -104,7 +104,7 @@ void define_poligon(int forma, int R, int G, int B, int tamanho, int x, int y, i
  * \param[in] endereco_memoria : Endereço de memória onde o sprite será armazenado
  * \return    1 caso operação seja bem sucedida, e 0 caso contrário.
 */
-void write_sprite_mem(int R, int G, int B, int endereco_memoria);
+void write_sprite_mem(uint8_t R, uint8_t G, uint8_t B, uint16_t endereco_memoria);
 
 /**
  * \brief Responsável por atualizar as coordenadas x e y de um sprit móvel de acordo ao seu ângulo de movimento e valor de deslocamento.
@@ -129,3 +129,4 @@ void clear_background_color();
 void clear_background_block();
 void clear_poligonos();
 void clear_sprite();
+int write_to_bus(unsigned char *buffer);
