@@ -17,6 +17,7 @@
 
 extern volatile int* HEX0_ptr;
 extern volatile int* HEX1_ptr;
+extern volatile int* HEX2_ptr;
 extern volatile int* HEX3_0_ptr;
 extern volatile int* KEY_ptr;
 
@@ -24,10 +25,10 @@ int button0, button1, button2;
 int gameStarted = 0; int paused = 0; int lido = 0;
 int state = 0; // pra acontecer as trocas de tela de acordo ao estado
 int pontuacao = 0;
+pthread_mutex_t mutex;
 
 
 int segmentos[10] = {
-  
     0b1000000,
     0b1111001,
     0b0100100,
@@ -47,29 +48,17 @@ void readButtons() {
 }
 
 
-
 void draw_game_screen() {
     // for........
     // setbackground..
     int i;
     for (i = 0; i < 4800; i++) {
-        int R = gameScreen[i][0];
-        int G = gameScreen[i][1];
-        int B = gameScreen[i][2];
+        int R = gameNew[i][0];
+        int G = gameNew[i][1];
+        int B = gameNew[i][2];
         set_background_block(i, R, G, B);
     }
 }
-
-// 0100
-// 1111
-// 0100
-// ------
-// 0100
-// 1011
-// 0000
-
-
-
 
 
 void* movimentoToupeira(void* arg) {
@@ -95,7 +84,7 @@ void* movimentoToupeira(void* arg) {
        // readButtons();
 
         if (button0 && state == 0) { // inicia se ainda nao tiver iniciado
-           // clear_background_block();
+            clear_background_block();
             
             draw_game_screen();
             gameStarted = 1;
@@ -131,14 +120,12 @@ void* movimentoToupeira(void* arg) {
         }
 
 
-
         if (gameStarted && paused == 0) {
 
             int current_time = time(NULL);
             int i;
             for (i = 0; i < 9; i++) {
-                printf("Processando toupeira %d\n", i);
-                printf("Toupeira %d: coord_y = %d, direction = %d, moving = %d, last_update = %d, interval = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction, toupeiras[i]->moving, toupeiras[i]->last_update, toupeiras[i]->interval);                
+                //printf("Toupeira %d: coord_y = %d, direction = %d, moving = %d, last_update = %d, interval = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction, toupeiras[i]->moving, toupeiras[i]->last_update, toupeiras[i]->interval);                
                 if (toupeiras[i]->moving) {
                     // Movimenta a toupeira
                     toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
@@ -162,19 +149,20 @@ void* movimentoToupeira(void* arg) {
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                     // Define um novo intervalo aleatório
                     toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
-                    printf("Toupeira %d retoma movimento com novo intervalo = %d\n", i, toupeiras[i]->interval);
+                    //printf("Toupeira %d retoma movimento com novo intervalo = %d\n", i, toupeiras[i]->interval);
                 }
                 readButtons();
             }
 
             if (pontuacao < 25) {
-                usleep(250000); // 250ms
+                usleep(300000); // 250ms
             } else if (pontuacao < 50) {
-                usleep(150000); // 150 ms
+                usleep(200000); // 150 ms
             } // mov mais rapido com maior pontuação
 
             if ((current_time - last_check_time) >= 5) {
                 printf("Verificação a cada 5 segundos: %d segundos decorridos\n", current_time - start_time - total_pause_time);
+
                 set_background_block(base_block_address, 7, 1, 1);
                 base_block_address -= 1;
                 last_check_time = current_time; // Atualiza o tempo da última verificação
@@ -194,14 +182,6 @@ uint8_t display(int number) {
     return segmentos_map;
 }
 
-
-// Condições pra incrementar a pontuação
-int increment_score(int leftButton, Sprite* toupeira, Sprite_Fixed* martelo) {
-    return collision(toupeira, martelo) &&
-    leftButton && 
-    toupeira->coord_y < toupeira->max_y && // toupeira fora do arbusto
-    !paused;
-}
 
 
 void* mouse(void* arg) {
@@ -246,14 +226,10 @@ void* mouse(void* arg) {
 
             int i;
             for (i = 0; i < 9; i++) {
-                // if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y && !paused) {
-                //     pontuacao += 1;
-                    if (increment_score(leftButton, toupeiras[i], martelo)) {
-                        pontuacao += 1;
-                    }
+                 if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y && !paused) {
+                    pontuacao += 1;
 
-
-               // }
+                }
             }
 
             printf("Posição X: %d, Posição Y: %d\n", x, y);
@@ -266,12 +242,11 @@ void* mouse(void* arg) {
             int dezena = pontuacao / 10;
             int unidade = pontuacao % 10;
             int centena = (pontuacao / 100) % 10;
-            int milhar = (pontuacao / 1000) % 10;
 
 
             *HEX0_ptr = display(unidade);
             *HEX1_ptr = display(dezena);
-            //*HEX2_ptr = display(centena);
+            *HEX2_ptr = display(centena);
 
 
             //*HEX3_0_ptr = (display(milhar) << 0x24) | (display(centena) << 0x16) | (display(dezena) << 0x8) | display(unidade);
@@ -332,19 +307,27 @@ void draw_initial_screen() {
 }
 
 
-
-
 int main() {
+    
    pthread_t thread1, thread2;
+//    pthread_mutex_init(&mutex, NULL);
 
-    mapPeripherals();
+     mapPeripherals();
 
-    clear_sprite();
+//     pthread_mutex_lock(&mutex);
+//     clear_sprite();
+//     pthread_mutex_unlock(&mutex);
+
+    // pthread_mutex_lock(&mutex);
+    // clear_background_color();
+    // pthread_mutex_unlock(&mutex);
 
     //set_background_color(1, 5, 5);
+    // pthread_mutex_lock(&mutex);
+    // clear_background_block();
+    // pthread_mutex_unlock(&mutex);
     //clear_background_color();
-    //clear_background_block();
-
+    clear_sprite();
     draw_initial_screen();
 
 
@@ -355,7 +338,9 @@ int main() {
         int G = marteloSp[i][1];
         int B = marteloSp[i][2];
         int endereco_memoria = 10000 + i;
+        //pthread_mutex_lock(&mutex);
         write_sprite_mem(R, G, B, endereco_memoria);
+        //pthread_mutex_unlock(&mutex);
     }
 
     for (i = 0; i < 400; i++) {
