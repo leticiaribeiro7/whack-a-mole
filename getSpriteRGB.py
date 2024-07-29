@@ -36,7 +36,6 @@
 # matrix = get_image_matrix(image_path)
 # save_matrix_to_file(matrix, 'matrix_rgb.txt')
 
-
 from PIL import Image
 import numpy as np
 
@@ -47,7 +46,10 @@ def get_image_matrix(image_path):
     # Redimensionar a imagem para 80x60 pixels
     img = img.resize((80, 60))
     
-    # Obter os pixels da imagem
+    # Converter a imagem para RGB (caso não seja)
+    img = img.convert('RGB')
+    
+    # Obter os pixels da imagem como um array NumPy
     pixels = np.array(img)
     
     # Inicializar a matriz RGB com zeros
@@ -56,7 +58,7 @@ def get_image_matrix(image_path):
     # Quantizar cada valor RGB para a escala de 0 a 7
     for i in range(60):
         for j in range(80):
-            r, g, b = pixels[i, j][:3]  # Ignorar o canal alpha se houver
+            r, g, b = pixels[i, j]  # pixels[i, j] já é uma tupla (r, g, b)
             quantized_pixels[i, j, 0] = r // 32
             quantized_pixels[i, j, 1] = g // 32
             quantized_pixels[i, j, 2] = b // 32
@@ -71,6 +73,6 @@ def save_matrix_to_file(matrix, file_path):
             file.write(row_str + ',\n')
 
 # Exemplo de uso
-image_path = 'sprites/tela-inicial.png'
+image_path = 'tela-game.png'
 matrix = get_image_matrix(image_path)
 save_matrix_to_file(matrix, 'matrix_rgb.txt')
