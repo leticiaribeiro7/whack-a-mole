@@ -171,15 +171,26 @@ static ssize_t device_read(struct file* filp, char* buffer, size_t length, loff_
  */
 static ssize_t device_write(struct file* filp, const char* buffer, size_t length, loff_t* offset) {
 
-    int values[MAX_SIZE];
+    int values[10];
     int instruction = 0;
+    //  int buffer_gpu = ioread32(wrfull_ptr);
 
-    while (*wrfull_ptr) {} /*Aguarda a fila esvaziar antes de mandar novas instruções*/
+    // while (buffer_gpu) {
+    //     buffer_gpu = ioread32(wrfull_ptr);
+    // }
+
+   // printk(KERN_INFO "Received msg: %s\n", msg);
+    
+    while (*wrfull_ptr){}
+     /*Aguarda a fila esvaziar antes de mandar novas instruções*/
 
     /*Copia os dados do buffer do usuário para a mensagem*/
     if (copy_from_user(msg, buffer, length) != 0) {
         return -EFAULT;
     }
+
+    msg[length] = '\0';
+
 
     /*Lê a instrução da mensagem*/
     sscanf(msg, "%d", &values[0]);
@@ -195,6 +206,7 @@ static ssize_t device_write(struct file* filp, const char* buffer, size_t length
         case WBM:
             sscanf(msg, "%d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4]);
             instruction_WBM(values[1], values[2], values[3], values[4]);
+            //printk(KERN_INFO "r: %d g: %d b: %d", values[2], values[3], values[4]);
             break;
         case DP:
             sscanf(msg, "%d %d %d %d %d %d %d %d %d", &values[0], &values[1], &values[2], &values[3], &values[4],
@@ -272,14 +284,17 @@ static int instruction_WBR(int R, int G, int B, int reg, int x, int y, int offse
 
 static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
     // Limitar R, G e B a 3 bits
+    endereco_memoria &= 0x1FFF;
+    R &= 0x7;
+    G &= 0x7;
+    B &= 0x7;
     
     // Limitar endereco_memoria a 13 bits
     
-    u32 data_a_value = ((endereco_memoria & 0x1FFF) << 4) | OPCODE_WBM;
-    u32 data_b_value = ((B & 0x7) << 6) | ((G & 0x7) << 3) | (R & 0x7);
-
-    // printf("Data A: 0x%X\n", data_a_value);
-    // printf("Data B: 0x%X\n", data_b_value);
+    u32 data_a_value = (endereco_memoria << 4) | OPCODE_WBM;
+    u32 data_b_value = (B << 6) | (G << 3) | R;
+    //printk(KERN_INFO "Data A3::: 0x%X\n", data_a_value);
+    //printk(KERN_INFO "Data B3::: 0x%X\n", data_b_value);
 
 
     // *data_a_ptr = data_a_value;
@@ -309,6 +324,7 @@ static int instruction_WBM(int endereco_memoria, int R, int G, int B) {
  */
 static int instruction_DP(int forma, int R, int G, int B, int tamanho, int x, int y, int endereco) {
     // Limitar R, G e B a 3 bits
+
     R &= 0x7;
     G &= 0x7;
     B &= 0x7;
