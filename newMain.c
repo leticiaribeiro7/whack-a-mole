@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include <stdint.h>
-// #include "headers/screens.h"
+#include "headers/screens.h"
 #include "headers/utils.h"
 #include "headers/spritesRGB.h"
 #include "headers/graphics_processor.h"
