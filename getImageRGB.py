@@ -33,5 +33,5 @@ def save_matrix_to_file(matrix, file_path):
             file.write(row_str + ',\n')
 
 image_path = 'sprites/tela-game.png'
-matrix = get_image_matrix(image_path, 60, 80)
+matrix = get_image_matrix(image_path, 80, 60)
 save_matrix_to_file(matrix, 'matrix_rgb.txt')
