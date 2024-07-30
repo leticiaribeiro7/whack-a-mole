@@ -29,7 +29,7 @@ extern volatile int* HEX3_0_ptr;
 extern volatile int* KEY_ptr;
 
 int button0, button1, button2, button3;
-int gameStarted = 0; int paused = 0; int lido = 0;
+int gameStarted = 0;
 int state = 0; // pra acontecer as trocas de tela de acordo ao estado
 int pontuacao = 0;
 
@@ -58,24 +58,30 @@ void readButtons() {
 void draw_game_screen() {
     int i;
     for (i = 0; i < 4800; i++) {
-        int R = gameNew[i][0];
-        int G = gameNew[i][1];
-        int B = gameNew[i][2];
+        int R = gameScreen[i][0];
+        int G = gameScreen[i][1];
+        int B = gameScreen[i][2];
         set_background_block(i, R, G, B);
     }
 }
 // column + line*80
 void draw_game_over_screen() {
-
+    int i;
+    for (i = 0; i < 4800; i++) {
+        int R = gameOver[i][0];
+        int G = gameOver[i][1];
+        int B = gameOver[i][2];
+        set_background_block(i, R, G, B);
+    }
 }
 
 void remove_pause_blocks() {
-    set_background_block(162, 0, 5, 7);
-    set_background_block(164, 0, 5, 7);
-    set_background_block(242, 0, 5, 7);
-    set_background_block(244, 0, 5, 7);
-    set_background_block(322, 0, 5, 7);
-    set_background_block(324, 0, 5, 7);
+    set_background_block(162, 1, 4, 6);
+    set_background_block(164, 1, 4, 6);
+    set_background_block(242, 1, 4, 6);
+    set_background_block(244, 1, 4, 6);
+    set_background_block(322, 1, 4, 6);
+    set_background_block(324, 1, 4, 6);
 }
 
 void draw_pause_blocks() {
@@ -100,28 +106,29 @@ void* movimentoToupeira(void* arg) {
     int pause_time = 0;
     int total_pause_time = 0;
     int last_check_time = 0;
+    int lastdif = 0;
 
     uint16_t base_block_address = 315; // teste
 
-    start_time = time(NULL);
-    last_check_time = time(NULL);
+    
 
     while (1) {
         // Escuta os botões
-       // readButtons();
+        readButtons();
 
         if (button0 && state == START) { // inicia se ainda nao tiver iniciado
             clear_background_block();
-            
             draw_game_screen();
-            gameStarted = 1;
             state = RUNNING; // rodando
+            start_time = time(NULL);
+            last_check_time = time(NULL);
         }
 
         if (button1 && state == RUNNING) { // so pausa se tiver rodando
             state = PAUSED; //pausado
             draw_pause_blocks();
             pause_time = time(NULL);
+            lastdif = time(NULL) - last_check_time; 
         }
 
         while (button1) {
@@ -134,20 +141,23 @@ void* movimentoToupeira(void* arg) {
             state = RUNNING;
             remove_pause_blocks();
             total_pause_time += time(NULL) - pause_time;
+            last_check_time = lastdif;
         }
 
         if (button2) { // restart
+            base_block_address = 315; // teste
             draw_game_screen(); // redesenha a tela do game
             state = RUNNING;
             pontuacao = 0; // reinicia pontuação
+            total_pause_time = 0;
             start_time = time(NULL); // reinicia o tempo
-            last_check_time = time(NULL);
+            last_check_time = start_time;
         }
 
         if (button3) { // encerra em qualquer state
             state = ENDED_BY_BUTTON; //encerrado
-            //clear_background_block();
-            draw_game_over_screen();
+            clear_sprite();
+            clear_background_block();
             break;
         }
 
@@ -175,33 +185,36 @@ void* movimentoToupeira(void* arg) {
                     }
                     set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
                     set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
-
-                    //printf("Toupeira %d movendo para coord_y = %d, direction = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction);
                     // Atualiza o sprite
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                     // Define um novo intervalo aleatório
                     toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
-                    //printf("Toupeira %d retoma movimento com novo intervalo = %d\n", i, toupeiras[i]->interval);
+                   
                 }
                 readButtons();
             }
 
             if (pontuacao < 25) {
-                usleep(300000); // 250ms
+                usleep(400000); // 250ms
             } else if (pontuacao < 50) {
-                usleep(200000); // 150 ms
+                usleep(300000); // 150 ms
             } // mov mais rapido com maior pontuação
 
             if ((current_time - last_check_time) >= 5) {
                 printf("Verificação a cada 5 segundos: %d segundos decorridos\n", current_time - start_time - total_pause_time);
+                printf("Tempo de pausa: %d", total_pause_time);
+                printf("Tempo de inicio: %d", start_time);
+                printf("Tempo atual: %d", current_time);
 
-                set_background_block(base_block_address, 0, 5, 7);
+                set_background_block(base_block_address, 1, 4, 6);
                 base_block_address -= 1;
-                last_check_time = current_time; // Atualiza o tempo da última verificação
+                last_check_time = time(NULL); // Atualiza o tempo da última verificação
             } // cada 5 seg
 
-            if ((current_time - start_time - total_pause_time) >= 45) {
+            if ((current_time - start_time - total_pause_time) >= 60) {
                 state = ENDED_BY_TIME;
+                clear_sprite();
+                clear_background_block();
                 draw_game_over_screen();
             }
         }
@@ -220,7 +233,6 @@ void* mouse(void* arg) {
     Sprite_Fixed* martelo = (Sprite_Fixed*)args[0];
     Sprite** toupeiras = (Sprite**)args[1];
 
-
     int fd;
     int x = 0, y = 0;
     int leftButton;
@@ -236,7 +248,6 @@ void* mouse(void* arg) {
     while(1) {
 
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
-            system("clear");
 
             x_disp = mouse_buffer[1];
             y_disp = mouse_buffer[2];
@@ -252,19 +263,20 @@ void* mouse(void* arg) {
             change_coordinate(martelo, x, y);
             // martelo->coord_x = x;
             // martelo->coord_y = y;
+            
 
 
             int i;
             for (i = 0; i < 9; i++) {
-                 if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y && !paused) {
+                 if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y && state == RUNNING) {
                     pontuacao += 1;
 
                 }
             }
 
+            printf("state %d", state);
+
             /* ======= DISPLAY ======== */
-
-
             /* Formatação da pontuação pra o display 7 */
             int dezena = pontuacao / 10;
             int unidade = pontuacao % 10;
@@ -334,35 +346,7 @@ int main() {
     clear_sprite();
     draw_initial_screen();
 
-
-        // Grava martelo
-    int i;
-    for (i = 0; i < 380; i++) {
-        int R = marteloSp[i][0];
-        int G = marteloSp[i][1];
-        int B = marteloSp[i][2];
-        int endereco_memoria = 10000 + i;
-        //pthread_mutex_lock(&mutex);
-        write_sprite_mem(R, G, B, endereco_memoria);
-        //pthread_mutex_unlock(&mutex);
-    }
-
-    for (i = 0; i < 400; i++) {
-        int R = toupeiraSp[i][0];
-        int G = toupeiraSp[i][1];
-        int B = toupeiraSp[i][2];
-        int endereco_memoria = 10400 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
-
-    for (i = 0; i < 400; i++) {
-        int R = arbustoSp[i][0];
-        int G = arbustoSp[i][1];
-        int B = arbustoSp[i][2];
-        int endereco_memoria = 10800 + i;
-        write_sprite_mem(R, G, B, endereco_memoria);
-    }
-
+    write_sprites();
 
 /* ============ CRIAÇÃO DE SPRITES ============= */
 
@@ -480,8 +464,6 @@ int main() {
         &toupeira9
     };
 
-
-
     Sprite_Fixed martelo;
     martelo.coord_x = 0;
     martelo.coord_y = 0;
@@ -570,11 +552,9 @@ int main() {
 
 // menor reg fica em cima
 
-    //write_sprites();
 
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
-    
     
   
 /*============== CRIAÇÃO DE THREADS ================== */
