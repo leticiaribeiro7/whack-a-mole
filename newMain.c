@@ -5,14 +5,21 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include <stdint.h>
+
 #include "headers/screens.h"
 #include "headers/utils.h"
+#include "headers/screensRGB.h"
 #include "headers/spritesRGB.h"
 #include "headers/graphics_processor.h"
 #include "headers/address_map_arm.h"
-#define MOUSEFILE "/dev/input/mice"
-#include "headers/screensRGB.h"
 
+#define MOUSEFILE "/dev/input/mice"
+
+#define START 0
+#define RUNNING 1
+#define PAUSED 2
+#define ENDED_BY_TIME 3
+#define ENDED_BY_BUTTON 4
 
 
 extern volatile int* HEX0_ptr;
@@ -21,11 +28,10 @@ extern volatile int* HEX2_ptr;
 extern volatile int* HEX3_0_ptr;
 extern volatile int* KEY_ptr;
 
-int button0, button1, button2;
+int button0, button1, button2, button3;
 int gameStarted = 0; int paused = 0; int lido = 0;
 int state = 0; // pra acontecer as trocas de tela de acordo ao estado
 int pontuacao = 0;
-pthread_mutex_t mutex;
 
 
 int segmentos[10] = {
@@ -44,13 +50,12 @@ int segmentos[10] = {
 void readButtons() {
     button0 = ((*KEY_ptr & 0b0001) == 0); // iniciar
     button1 = ((*KEY_ptr & 0b0010) == 0); // pausar
-    button2 = ((*KEY_ptr & 0b0100) == 0); // parar
+    button2 = ((*KEY_ptr & 0b0100) == 0); // reiniciar
+    button3 = ((*KEY_ptr & 0b1000) == 0); // parar
 }
 
 
 void draw_game_screen() {
-    // for........
-    // setbackground..
     int i;
     for (i = 0; i < 4800; i++) {
         int R = gameNew[i][0];
@@ -58,6 +63,28 @@ void draw_game_screen() {
         int B = gameNew[i][2];
         set_background_block(i, R, G, B);
     }
+}
+// column + line*80
+void draw_game_over_screen() {
+
+}
+
+void remove_pause_blocks() {
+    set_background_block(162, 0, 5, 7);
+    set_background_block(164, 0, 5, 7);
+    set_background_block(242, 0, 5, 7);
+    set_background_block(244, 0, 5, 7);
+    set_background_block(322, 0, 5, 7);
+    set_background_block(324, 0, 5, 7);
+}
+
+void draw_pause_blocks() {
+    set_background_block(162, 7, 1, 1);
+    set_background_block(164, 7, 1, 1);
+    set_background_block(242, 7, 1, 1);
+    set_background_block(244, 7, 1, 1);
+    set_background_block(322, 7, 1, 1);
+    set_background_block(324, 7, 1, 1);
 }
 
 
@@ -74,7 +101,7 @@ void* movimentoToupeira(void* arg) {
     int total_pause_time = 0;
     int last_check_time = 0;
 
-    uint16_t base_block_address = 950; // teste
+    uint16_t base_block_address = 315; // teste
 
     start_time = time(NULL);
     last_check_time = time(NULL);
@@ -83,44 +110,49 @@ void* movimentoToupeira(void* arg) {
         // Escuta os botões
        // readButtons();
 
-        if (button0 && state == 0) { // inicia se ainda nao tiver iniciado
+        if (button0 && state == START) { // inicia se ainda nao tiver iniciado
             clear_background_block();
             
             draw_game_screen();
             gameStarted = 1;
-            state = 1; // rodando
+            state = RUNNING; // rodando
         }
 
-        if (button1 && state == 1) { // so pausa se tiver rodando
-            paused = 1;
-            //printf("paused %d", paused);
-            state = 2; //pausado
+        if (button1 && state == RUNNING) { // so pausa se tiver rodando
+            state = PAUSED; //pausado
+            draw_pause_blocks();
             pause_time = time(NULL);
         }
 
         while (button1) {
-            readButtons();
+            readButtons(); /* aguarda soltar o botão */
         }
 
         readButtons();
 
-        if (button1 && state == 2) { // retorna da pausa se tiver pausado
-            paused = 0;
-            state = 1;
+        if (button1 && state == PAUSED) { // retorna da pausa se tiver pausado
+            state = RUNNING;
+            remove_pause_blocks();
             total_pause_time += time(NULL) - pause_time;
         }
 
+        if (button2) { // restart
+            draw_game_screen(); // redesenha a tela do game
+            state = RUNNING;
+            pontuacao = 0; // reinicia pontuação
+            start_time = time(NULL); // reinicia o tempo
+            last_check_time = time(NULL);
+        }
 
-        if (button2) { // encerra em qualquer state
-            gameStarted = 0;
-            state = 3; //encerrado
+        if (button3) { // encerra em qualquer state
+            state = ENDED_BY_BUTTON; //encerrado
             //clear_background_block();
-            //draw_stop_screen();
+            draw_game_over_screen();
             break;
         }
 
 
-        if (gameStarted && paused == 0) {
+        if (state == RUNNING) {
 
             int current_time = time(NULL);
             int i;
@@ -163,23 +195,22 @@ void* movimentoToupeira(void* arg) {
             if ((current_time - last_check_time) >= 5) {
                 printf("Verificação a cada 5 segundos: %d segundos decorridos\n", current_time - start_time - total_pause_time);
 
-                set_background_block(base_block_address, 7, 1, 1);
+                set_background_block(base_block_address, 0, 5, 7);
                 base_block_address -= 1;
                 last_check_time = current_time; // Atualiza o tempo da última verificação
             } // cada 5 seg
 
             if ((current_time - start_time - total_pause_time) >= 45) {
-                printf("%s", "acabou");
-                //draw jogo encerrado
-                break;
+                state = ENDED_BY_TIME;
+                draw_game_over_screen();
             }
         }
     }
 }
 
 uint8_t display(int number) {
-    uint8_t segmentos_map = segmentos[number];
-    return segmentos_map;
+    return segmentos[number];
+    //return segmentos_map;
 }
 
 
@@ -202,7 +233,6 @@ void* mouse(void* arg) {
         exit(EXIT_FAILURE);
     }
 
-    // int pontuacao = 0;
     while(1) {
 
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
@@ -232,13 +262,10 @@ void* mouse(void* arg) {
                 }
             }
 
-            printf("Posição X: %d, Posição Y: %d\n", x, y);
-            printf("PONTUAÇÃO: %d\n", pontuacao);
-            //     ======= DISPLAY ========
+            /* ======= DISPLAY ======== */
 
-        // *HEX0_ptr = display(pontuacao); // segmento 6 - 0, logica invertida
 
-            /* Formatação da pontuação pra o display 7*/
+            /* Formatação da pontuação pra o display 7 */
             int dezena = pontuacao / 10;
             int unidade = pontuacao % 10;
             int centena = (pontuacao / 100) % 10;
@@ -248,18 +275,13 @@ void* mouse(void* arg) {
             *HEX1_ptr = display(dezena);
             *HEX2_ptr = display(centena);
 
-
-            //*HEX3_0_ptr = (display(milhar) << 0x24) | (display(centena) << 0x16) | (display(dezena) << 0x8) | display(unidade);
-
-
-            //printf("botao: %d", *KEY_ptr); // tem logica invertida
-
         }   
+        if (state == ENDED_BY_BUTTON) {
+            break;
+        }
+
     }
 
-    if (state == 3) {
-        pontuacao = 0;
-    }
 
     return NULL;
 }
@@ -295,8 +317,6 @@ void write_sprites() {
 
 
 void draw_initial_screen() {
-    // for........
-    // setbackground..
     int i;
     for (i = 0; i < 4800; i++) {
         int R = initialScreen[i][0];
@@ -306,27 +326,11 @@ void draw_initial_screen() {
     }
 }
 
-
 int main() {
     
-   pthread_t thread1, thread2;
-//    pthread_mutex_init(&mutex, NULL);
+    pthread_t thread1, thread2;
 
-     mapPeripherals();
-
-//     pthread_mutex_lock(&mutex);
-//     clear_sprite();
-//     pthread_mutex_unlock(&mutex);
-
-    // pthread_mutex_lock(&mutex);
-    // clear_background_color();
-    // pthread_mutex_unlock(&mutex);
-
-    //set_background_color(1, 5, 5);
-    // pthread_mutex_lock(&mutex);
-    // clear_background_block();
-    // pthread_mutex_unlock(&mutex);
-    //clear_background_color();
+    mapPeripherals();
     clear_sprite();
     draw_initial_screen();
 

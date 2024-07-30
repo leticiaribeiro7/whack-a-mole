@@ -69,10 +69,10 @@ def save_matrix_to_file(matrix, file_path):
     # Salvar a matriz em um arquivo de texto
     with open(file_path, 'w') as file:
         for row in matrix:
-            row_str = ','.join(f'[{r},{g},{b}]' for r, g, b in row)
+            row_str = ','.join(f'{{{r},{g},{b}}}' for r, g, b in row)
             file.write(row_str + ',\n')
 
 # Exemplo de uso
-image_path = 'tela-game.png'
+image_path = 'sprites/tela-game.png'
 matrix = get_image_matrix(image_path)
 save_matrix_to_file(matrix, 'matrix_rgb.txt')
