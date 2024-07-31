@@ -25,7 +25,11 @@
 extern volatile int* HEX0_ptr;
 extern volatile int* HEX1_ptr;
 extern volatile int* HEX2_ptr;
-extern volatile int* HEX3_0_ptr;
+
+extern volatile int* HEX3_ptr;
+extern volatile int* HEX4_ptr;
+extern volatile int* HEX5_ptr;
+
 extern volatile int* KEY_ptr;
 
 int button0, button1, button2, button3;
@@ -105,7 +109,7 @@ void* movimentoToupeira(void* arg) {
     int pause_time = 0;
     int total_pause_time = 0;
     int last_check_time = 0;
-    int lastdif = 0;
+    
 
     uint16_t base_block_address = 315; /* Endereço do último bloco na barra de tempo */
 
@@ -195,12 +199,7 @@ void* movimentoToupeira(void* arg) {
                 usleep(300000); // 150 ms
             } // mov mais rapido com maior pontuação
 
-            if ((current_time - last_check_time) >= 5 || (pause_time - last_check_time == 5)) {
-                printf("Verificação a cada 5 segundos: %d segundos decorridos\n", current_time - start_time - total_pause_time);
-                printf("Tempo de pausa: %d", total_pause_time);
-                printf("Tempo de inicio: %d", start_time);
-                printf("Tempo atual: %d", current_time);
-
+            if ((current_time - last_check_time) >= 5) {
                 set_background_block(base_block_address, 1, 4, 6);
                 base_block_address -= 1;
                 last_check_time = time(NULL); // Atualiza o tempo da última verificação
@@ -269,7 +268,6 @@ void* mouse(void* arg) {
                 }
             }
 
-            printf("state %d", state);
 
             /* ======= DISPLAY ======== */
             /* Formatação da pontuação pra o display 7 */
@@ -339,6 +337,13 @@ int main() {
     draw_initial_screen();
 
     write_sprites();
+
+    /* Apaga  mostrador de 7 segmentos */
+    *HEX3_ptr = 0b1111111;
+    *HEX4_ptr = 0b1111111;
+    *HEX5_ptr = 0b1111111;
+    
+
 
 /* ============ CRIAÇÃO DE SPRITES ============= */
 
