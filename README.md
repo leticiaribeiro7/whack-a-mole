@@ -33,6 +33,7 @@
     - Pontuação e Temporizador
     - Botões e Display
 
+- [Solução Geral]
 - [Cenários de Testes](#cenários-de-testes)
 - [Conclusão](#conclusão)
 - [Referências](#referências)
@@ -112,22 +113,6 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
     Figura 4. Estrutura Interna do Processador Gráfico. (Fonte: TCC de [Gabriel B. Alves])
 </p>
 
-### Unidade de Controle
-<p align="justify"> 
-A Unidade de Controle do processador gráfico da placa DE1-SoC desempenha um papel fundamental na gestão das operações internas do processador, operando como uma Máquina de Estados que coordena o fluxo de instruções:
-</p>
-
- 
-- Leitura de Instruções: Responsável por ler as instruções armazenadas na memória, que incluem comandos para modificar o <i>background</i>, movimentar <i>sprites</i> e renderizar polígonos.
-- Decodificação de Instruções: Interpreta os bits das instruções para determinar as ações específicas a serem realizadas pelo processador gráfico.
-- Execução de Instruções: Realiza as operações indicadas pelas instruções, incluindo a alteração do <i>background</i>, renderização de polígonos e movimento de <i>sprites</i>.
-
-
-### Banco de Registradores
-<p align="justify"> 
-O Banco de Registradores é composto por 32 registradores. O primeiro é reservado para a cor de fundo da tela, enquanto os 31 restantes são dedicados ao armazenamento das informações dos <i>sprites</i>. Essa organização permite que o processador gráfico temporariamente armazene informações essenciais de cada <i>sprite</i>, como coordenadas, offset de memória de um bit de ativação, possibilitando o gerenciamento de até 31 <i>sprites</i> simultaneamente em um único <i>frame</i> de tela.
-</p>
-
 ### Módulo de Desenho
 <p align="justify"> 
 O Módulo de Desenho gerencia todo o processo de renderização dos <i>pixels</i> no monitor VGA. Ele converte e envia os dados de cor RGB para cada <i>pixel</i>, garantindo a precisão da imagem exibida no monitor. A utilização de uma arquitetura de <i>Pipeline</i> permite ao módulo processar múltiplas instruções ao mesmo tempo, aumentando a eficiência do processamento e previnindo distorções na saída do monitor VGA.
@@ -148,26 +133,18 @@ A memória de <i>sprites</i> é responsável por armazenar os <i>bitmapes</i> de
 A memória de <i>background</i> é usada para modificar pequenas partes do fundo da tela. Ela consiste em 4.800 palavras de 9 bits cada, com 3 bits destinados a cada componente de cor RGB. Esta configuração permite ajustar e atualizar dinamicamente seções específicas do <i>background</i>, garantindo flexibilidade e precisão na exibição gráfica.
 </p>
 
-### Co-Processador
+
+## Threads
+
 <p align="justify">
-O Co-Processador é responsável por gerenciar a construção de polígonos convexos, como quadrados e triângulos. Estes polígonos são renderizados na tela do monitor VGA, trabalhando em conjunto com os sprites e o background. A arquitetura do Co-Processador permite a execução de cálculos necessários para determinar a posição e as características desses polígonos. Ao fazer isso, ele assegura que os polígonos sejam integrados corretamente com outros elementos gráficos, proporcionando uma renderização precisa e sincronizada. Isso é essencial para a exibição coerente e harmoniosa de todos os componentes visuais na tela.
+Para que o jogo funcione de forma satisfatória, é necessário que múltiplos movimentos ocorram independentemente na tela, ou seja, as toupeiras e o martelo devem se mover ao mesmo tempo. Devido a este requisito, duas threads foram implementadas, cada uma responsável pelo movimento de um tipo de elemento do jogo.
+
+As toupeiras são elementos passivos, que significa que não precisam de ação do jogador para se movimentar, enquanto o martelo é um elemento ativo que é controlado pelo jogador, portanto a lógica de movimento das toupeira está em uma thread e a do martelo está em outra.
+
+
 </p>
 
 
-## Detalhamento da Lógica de Comunicação
-### Mapeamento de Memória
-<p align="justify"> 
-Para que haja comunicação entre hardware e software no ambiente Linux, é necessário aplicar a técnica de mapeamento de memória. Devido ao Linux utilizar um sistema de memória virtual, os endereços físicos do hardware não ficam disponíveis para acesso direto em programas em execução. O Kernel disponibiliza a função mmap que pode ser usada em conjunto com o arquivo /dev/mem e assim mapear os endereços físicos para endereços virtuais, permitindo o acesso ao hardware.
-</p>
-<p align="justify"> 
-No contexto do projeto, essa técnica foi usada para ter acesso aos barramentos Data A e Data B do Processador Gráfico, que se encontra na FPGA. O processador ARM (HPS) possui as pontes de acesso HPS-to-FPGA e LightWeight-to-FPGA, que são mapeadas para regiões no espaço de memória do HPS, ao utilizar uma delas é possível acessar os barramentos através da soma da ponte + offset, que representa o endereço base.
-    
-```c
-// LW_virtual => endereço da LightWeight-to-FPGA
-// DATA_A_BASE => endereço base do barramento data A, representando o offset
-data_a_ptr = (int*)(LW_virtual + DATA_A_BASE);
-```
-</p>
 
 ### Fluxograma da Solução Geral do Projeto
 
