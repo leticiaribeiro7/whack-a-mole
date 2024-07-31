@@ -29,7 +29,6 @@ extern volatile int* HEX3_0_ptr;
 extern volatile int* KEY_ptr;
 
 int button0, button1, button2, button3;
-int gameStarted = 0;
 int state = 0; // pra acontecer as trocas de tela de acordo ao estado
 int pontuacao = 0;
 
@@ -108,9 +107,7 @@ void* movimentoToupeira(void* arg) {
     int last_check_time = 0;
     int lastdif = 0;
 
-    uint16_t base_block_address = 315; // teste
-
-    
+    uint16_t base_block_address = 315; /* Endereço do último bloco na barra de tempo */
 
     while (1) {
         // Escuta os botões
@@ -128,7 +125,7 @@ void* movimentoToupeira(void* arg) {
             state = PAUSED; //pausado
             draw_pause_blocks();
             pause_time = time(NULL);
-            lastdif = time(NULL) - last_check_time; 
+            //lastdif = time(NULL) - last_check_time; 
         }
 
         while (button1) {
@@ -141,17 +138,16 @@ void* movimentoToupeira(void* arg) {
             state = RUNNING;
             remove_pause_blocks();
             total_pause_time += time(NULL) - pause_time;
-            last_check_time = lastdif;
         }
 
         if (button2) { // restart
-            base_block_address = 315; // teste
-            draw_game_screen(); // redesenha a tela do game
+            base_block_address = 315;
             state = RUNNING;
             pontuacao = 0; // reinicia pontuação
             total_pause_time = 0;
             start_time = time(NULL); // reinicia o tempo
             last_check_time = start_time;
+            draw_game_screen(); // redesenha a tela do game
         }
 
         if (button3) { // encerra em qualquer state
@@ -167,7 +163,6 @@ void* movimentoToupeira(void* arg) {
             int current_time = time(NULL);
             int i;
             for (i = 0; i < 9; i++) {
-                //printf("Toupeira %d: coord_y = %d, direction = %d, moving = %d, last_update = %d, interval = %d\n", i, toupeiras[i]->coord_y, toupeiras[i]->direction, toupeiras[i]->moving, toupeiras[i]->last_update, toupeiras[i]->interval);                
                 if (toupeiras[i]->moving) {
                     // Movimenta a toupeira
                     toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
@@ -200,7 +195,7 @@ void* movimentoToupeira(void* arg) {
                 usleep(300000); // 150 ms
             } // mov mais rapido com maior pontuação
 
-            if ((current_time - last_check_time) >= 5) {
+            if ((current_time - last_check_time) >= 5 || (pause_time - last_check_time == 5)) {
                 printf("Verificação a cada 5 segundos: %d segundos decorridos\n", current_time - start_time - total_pause_time);
                 printf("Tempo de pausa: %d", total_pause_time);
                 printf("Tempo de inicio: %d", start_time);
@@ -223,7 +218,6 @@ void* movimentoToupeira(void* arg) {
 
 uint8_t display(int number) {
     return segmentos[number];
-    //return segmentos_map;
 }
 
 
@@ -247,6 +241,10 @@ void* mouse(void* arg) {
 
     while(1) {
 
+        if (state == ENDED_BY_BUTTON) {
+            break;
+        }
+
         if (read(fd, &mouse_buffer, sizeof(mouse_buffer)) > 0) {
 
             x_disp = mouse_buffer[1];
@@ -261,9 +259,6 @@ void* mouse(void* arg) {
 
             set_sprite(martelo->data_register, x, y, martelo->offset, 1);
             change_coordinate(martelo, x, y);
-            // martelo->coord_x = x;
-            // martelo->coord_y = y;
-            
 
 
             int i;
@@ -288,9 +283,6 @@ void* mouse(void* arg) {
             *HEX2_ptr = display(centena);
 
         }   
-        if (state == ENDED_BY_BUTTON) {
-            break;
-        }
 
     }
 
@@ -298,9 +290,9 @@ void* mouse(void* arg) {
     return NULL;
 }
 
+/* Escreve sprites na memória a partir do offset 25 */
 void write_sprites() {
 
-    // Grava martelo
     int i;
     for (i = 0; i < 380; i++) {
         int R = marteloSp[i][0];
@@ -353,104 +345,104 @@ int main() {
 // primeira linha
     Sprite toupeira1;
     toupeira1.coord_x = 200;
-    toupeira1.coord_y = 250;
+    toupeira1.coord_y = 300;
     toupeira1.offset = 26;
     toupeira1.data_register = 11;
     toupeira1.ativo = 1;
-    toupeira1.direction = 1; // 1 ou -1
+    toupeira1.direction = 1;
     toupeira1.moving = 1;
-    toupeira1.min_y = 250;
-    toupeira1.max_y = 235;
+    toupeira1.min_y = 300;
+    toupeira1.max_y = 285;
 
     Sprite toupeira2;
     toupeira2.coord_x = 300;
-    toupeira2.coord_y = 250;
+    toupeira2.coord_y = 300;
     toupeira2.offset = 26;
     toupeira2.data_register = 12;
     toupeira2.ativo = 1;
-    toupeira2.direction = 1; // 1 ou -1
+    toupeira2.direction = 1;
     toupeira2.moving = 1;
-    toupeira2.min_y = 250;
-    toupeira2.max_y = 235;
+    toupeira2.min_y = 300;
+    toupeira2.max_y = 285;
 
     Sprite toupeira3;
     toupeira3.coord_x = 400;
-    toupeira3.coord_y = 250;
+    toupeira3.coord_y = 300;
     toupeira3.offset = 26;
     toupeira3.data_register = 13;
     toupeira3.ativo = 1;
-    toupeira3.direction = 1; // 1 ou -1
+    toupeira3.direction = 1;
     toupeira3.moving = 1;
-    toupeira3.min_y = 250;
-    toupeira3.max_y = 235;
+    toupeira3.min_y = 300;
+    toupeira3.max_y = 285;
 
 // segunda linha
     Sprite toupeira4;
     toupeira4.coord_x = 200;
-    toupeira4.coord_y = 300;
+    toupeira4.coord_y = 350;
     toupeira4.offset = 26;
     toupeira4.data_register = 14;
     toupeira4.ativo = 1;
-    toupeira4.direction = 1; // 1 ou -1
+    toupeira4.direction = 1;
     toupeira4.moving = 1;
-    toupeira4.min_y = 300;
-    toupeira4.max_y = 285;
+    toupeira4.min_y = 350;
+    toupeira4.max_y = 335;
 
     Sprite toupeira5;
     toupeira5.coord_x = 300;
-    toupeira5.coord_y = 300;
+    toupeira5.coord_y = 350;
     toupeira5.offset = 26;
     toupeira5.data_register = 15;
     toupeira5.ativo = 1;
-    toupeira5.direction = 1; // 1 ou -1
+    toupeira5.direction = 1;
     toupeira5.moving = 1;
-    toupeira5.min_y = 300;
-    toupeira5.max_y = 285;
+    toupeira5.min_y = 350;
+    toupeira5.max_y = 335;
 
     Sprite toupeira6;
     toupeira6.coord_x = 400;
-    toupeira6.coord_y = 300;
+    toupeira6.coord_y = 350;
     toupeira6.offset = 26;
     toupeira6.data_register = 16;
     toupeira6.ativo = 1;
-    toupeira6.direction = 1; // 1 ou -1
+    toupeira6.direction = 1;
     toupeira6.moving = 1;
-    toupeira6.min_y = 300;
-    toupeira6.max_y = 285;
-    // terceira linha
+    toupeira6.min_y = 350;
+    toupeira6.max_y = 335;
+
+    /* Toupeiras - linha 3 */
     Sprite toupeira7;
     toupeira7.coord_x = 200;
-    toupeira7.coord_y = 350;
+    toupeira7.coord_y = 400;
     toupeira7.offset = 26;
     toupeira7.data_register = 17;
     toupeira7.ativo = 1;
-    toupeira7.direction = 1; // 1 ou -1
+    toupeira7.direction = 1;
     toupeira7.moving = 1;
-    toupeira7.min_y = 350;
-    toupeira7.max_y = 335;
+    toupeira7.min_y = 400;
+    toupeira7.max_y = 385;
 
     Sprite toupeira8;
     toupeira8.coord_x = 300;
-    toupeira8.coord_y = 350;
+    toupeira8.coord_y = 400;
     toupeira8.offset = 26;
     toupeira8.data_register = 18;
     toupeira8.ativo = 1;
-    toupeira8.direction = 1; // 1 ou -1
+    toupeira8.direction = 1;
     toupeira8.moving = 1;
-    toupeira8.min_y = 350;
-    toupeira8.max_y = 335;
+    toupeira8.min_y = 400;
+    toupeira8.max_y = 385;
 
     Sprite toupeira9;
     toupeira9.coord_x = 400;
-    toupeira9.coord_y = 350;
+    toupeira9.coord_y = 400;
     toupeira9.offset = 26;
     toupeira9.data_register = 19;
     toupeira9.ativo = 1;
-    toupeira9 ;
-    toupeira9.direction = 1; // 1 ou -1
+    toupeira9.direction = 1;
     toupeira9.moving = 1;
-    toupeira9.min_y = 350;
-    toupeira9.max_y = 335;
+    toupeira9.min_y = 400;
+    toupeira9.max_y = 385;
 
     Sprite* toupeiras[9] = {
         &toupeira1,
@@ -471,24 +463,24 @@ int main() {
     martelo.ativo = 1;
     martelo.data_register = 1;
 
-//Arbusto linha 1
+    /* Arbustos - linha 1 */
     Sprite_Fixed arbusto1;
     arbusto1.coord_x = 200;
-    arbusto1.coord_y = 250;
+    arbusto1.coord_y = 300;
     arbusto1.offset = 27;
     arbusto1.ativo = 1;
     arbusto1.data_register = 2; 
 
     Sprite_Fixed arbusto2;
     arbusto2.coord_x = 300;
-    arbusto2.coord_y = 250;
+    arbusto2.coord_y = 300;
     arbusto2.offset = 27;
     arbusto2.ativo = 1;
     arbusto2.data_register = 3; 
 
     Sprite_Fixed arbusto3;
     arbusto3.coord_x = 400;
-    arbusto3.coord_y = 250;
+    arbusto3.coord_y = 300;
     arbusto3.offset = 27;
     arbusto3.ativo = 1;
     arbusto3.data_register = 4; 
@@ -497,21 +489,21 @@ int main() {
 // linha 2
     Sprite_Fixed arbusto4;
     arbusto4.coord_x = 200;
-    arbusto4.coord_y = 300;
+    arbusto4.coord_y = 350;
     arbusto4.offset = 27;
     arbusto4.ativo = 1;
     arbusto4.data_register = 5; 
 
     Sprite_Fixed arbusto5;
     arbusto5.coord_x =  300;
-    arbusto5.coord_y = 300;
+    arbusto5.coord_y = 350;
     arbusto5.offset = 27;
     arbusto5.ativo = 1;
     arbusto5.data_register = 6; 
 
     Sprite_Fixed arbusto6;
     arbusto6.coord_x = 400;
-    arbusto6.coord_y = 300;
+    arbusto6.coord_y = 350;
     arbusto6.offset = 27;
     arbusto6.ativo = 1;
     arbusto6.data_register = 7; 
@@ -519,21 +511,21 @@ int main() {
 //linha 3
     Sprite_Fixed arbusto7;
     arbusto7.coord_x = 200;
-    arbusto7.coord_y = 350;
+    arbusto7.coord_y = 400;
     arbusto7.offset = 27;
     arbusto7.ativo = 1;
     arbusto7.data_register = 8; 
 
     Sprite_Fixed arbusto8;
     arbusto8.coord_x = 300;
-    arbusto8.coord_y = 350;
+    arbusto8.coord_y = 400;
     arbusto8.offset = 27;
     arbusto8.ativo = 1;
     arbusto8.data_register = 9; 
 
     Sprite_Fixed arbusto9;
     arbusto9.coord_x = 400;
-    arbusto9.coord_y = 350;
+    arbusto9.coord_y = 400;
     arbusto9.offset = 27;
     arbusto9.ativo = 1;
     arbusto9.data_register = 10; 
@@ -550,14 +542,11 @@ int main() {
         &arbusto9
     };
 
-// menor reg fica em cima
-
-
     void* args[3] = { &martelo, &toupeiras, &arbustos};
 
-    
   
-/*============== CRIAÇÃO DE THREADS ================== */
+    /*============== CRIAÇÃO DE THREADS ================== */
+
     if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
         perror("Failed to create thread 1");
         return 1;
