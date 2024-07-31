@@ -10,7 +10,9 @@ volatile int* HEX0_ptr;
 volatile int* HEX1_ptr;
 volatile int* HEX2_ptr;
 volatile int* HEX3_ptr;
-volatile int* HEX3_0_ptr;
+volatile int* HEX4_ptr;
+volatile int* HEX5_ptr;
+
 
 void mapPeripherals() {
     
@@ -34,12 +36,12 @@ void mapPeripherals() {
 
     // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
     KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
-    HEX3_0_ptr = (int *)(LW_virtual + HEX3_HEX0_BASE);
     HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
     HEX1_ptr = (int *)(LW_virtual + HEX1_BASE);
     HEX2_ptr = (int *)(LW_virtual + HEX2_BASE);
     HEX3_ptr = (int *)(LW_virtual + HEX3_BASE);
-
+    HEX4_ptr = (int *)(LW_virtual + HEX4_BASE);
+    HEX5_ptr = (int *)(LW_virtual + HEX5_BASE);
 
 }
 
