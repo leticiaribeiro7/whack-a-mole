@@ -37,7 +37,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - [Srites novos](#sprites-novas)
+    - [Sprites novos](#sprites-novas)
     - Colisão 
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
