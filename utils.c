@@ -3,6 +3,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdint.h>
 
 
 volatile int* KEY_ptr;
@@ -12,6 +13,21 @@ volatile int* HEX2_ptr;
 volatile int* HEX3_ptr;
 volatile int* HEX4_ptr;
 volatile int* HEX5_ptr;
+
+
+/* Array para mapeamento dos segmentos em binário para decimal */
+int segmentos[10] = {
+    0b1000000,
+    0b1111001,
+    0b0100100,
+    0b0110000,
+    0b0011001,
+    0b0010010,
+    0b0000010,
+    0b1111000,
+    0b0000000,
+    0b0010000
+};
 
 
 void mapPeripherals() {
@@ -50,4 +66,8 @@ void limitarCursor(int *x, int *y) {
     if (*y <= 1) *y = 1;
     if (*x >= 620) *x = 620;
     if (*y >= 461) *y = 461;
+}
+
+uint8_t display(int number) {
+    return segmentos[number];
 }

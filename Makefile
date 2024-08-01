@@ -16,4 +16,4 @@ clean:
 
 # Compilação da biblioteca e programa principal
 lib:
-	gcc -pthread graphics_processor_lib.c utils.c newMain.c -o main
+	gcc -pthread graphics_processor_lib.c utils.c main.c -o main

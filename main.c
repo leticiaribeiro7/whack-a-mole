@@ -35,19 +35,19 @@ int state = 0; /* Controladora de estado*/
 int pontuacao = 0;
 
 
-/* Array para mapeamento dos segmentos em binário para decimal */
-int segmentos[10] = {
-    0b1000000,
-    0b1111001,
-    0b0100100,
-    0b0110000,
-    0b0011001,
-    0b0010010,
-    0b0000010,
-    0b1111000,
-    0b0000000,
-    0b0010000
-};
+// /* Array para mapeamento dos segmentos em binário para decimal */
+// int segmentos[10] = {
+//     0b1000000,
+//     0b1111001,
+//     0b0100100,
+//     0b0110000,
+//     0b0011001,
+//     0b0010010,
+//     0b0000010,
+//     0b1111000,
+//     0b0000000,
+//     0b0010000
+// };
 
 /**
  * \brief Função que lê o estado dos botões e atualiza as variáveis correspondentes
@@ -275,10 +275,8 @@ void* movimentoToupeira(void* arg) {
                     toupeiras[i]->interval = rand() % 3 + 1; /*entre 1 e 3 seg*/
 
                     /*Verifica se chegou ao limite e inverte a direção*/
-                    /*Ta em cima e desce*/
                     if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
                         toupeiras[i]->direction = -1;
-                    /*Ta embaixo e para*/
                     } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
                         toupeiras[i]->direction = 1;
                         toupeiras[i]->moving = 0;
@@ -286,7 +284,6 @@ void* movimentoToupeira(void* arg) {
                     }
                     set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
                     set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
-                    /*Atualiza o sprite*/
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
                     /*Define um novo intervalo aleatório*/
                     toupeiras[i]->moving = 1; /*Retoma o movimento da toupeira*/
@@ -321,9 +318,7 @@ void* movimentoToupeira(void* arg) {
     }
 }
 
-uint8_t display(int number) {
-    return segmentos[number];
-}
+
 
 
 
