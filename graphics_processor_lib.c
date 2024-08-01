@@ -184,6 +184,7 @@ void change_coordinate(Sprite_Fixed* sp, int new_x, int new_y) {
  * \param[in]       sp1: Ponteiro para a primeira sprite
  * \param[in]       sp2: Ponteiro para a segunda sprite
  * \return          1 se houver colisão, 0 caso contrário
+
  */
 int collision(Sprite* sp1, Sprite_Fixed* sp2) {
     return sp1->coord_x < sp2->coord_x + SPRITE_SIZE &&
