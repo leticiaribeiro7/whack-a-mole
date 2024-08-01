@@ -1,6 +1,5 @@
 <h1 align="center"> Whack a Mole - Jogo 2D</h1>
 
-
 ## Sobre
 
 <p align="justify"> 
@@ -36,16 +35,21 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Processador Gráfico]
     - [Módulo de Kernel]
 
+
 - [Uso de Threads]
     - Thread1 - Movimento do Martelo
     - Thread2 - Movimento das Toupeiras
 
-- [Implementação do Jogo]
+
+
+- [Implementação do Jogo](#implementação-do-jogo)
     - Srites novas
     - Colisão 
-    - Movimentações (mouse e toupeiras)
-    - Pontuação e Temporizador
-    - Botões e Display
+    - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
+    - [Uso dos Botões](#uso-dos-botões)
+    - [Display 7 Segmentos](#display-7-segmentos)
+    - [Temporizador](#temporizador)
+    - [Regras e Jogabilidade](#regras-e-jogabilidade)
 
 - [Solução Geral]
 - [Cenários de Testes](#cenários-de-testes)
@@ -214,17 +218,39 @@ Além dessa técnica, foi empregado também o uso de máscaras de bits para cada
 Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi implementada uma máquina de estados. As transições, estados e entradas necessárias para que aconteçam estão detalhadas no diagrama a seguir:
 </p>
 <p align="center">
-    <img src="imagens/state-machine.png"width="300">
+    <img src="imagens/state-machine1.png"width="300">
     <br>
 <p>
 
+### Display 7 Segmentos
+<p align="justify">
+A pontuação do jogo é mostrada no display de 7 segmentos, dos 6 dígitos disponíveis foram usados 3 para contar até a casa das centenas, devido ao tempo do jogo ser limitado. Foi usado um ponteiro para cada dígito do display, portanto a pontuação precisou ser isolada em dígitos separados, essa lógica foi implementada utilizando divisões e resto de divisões:
+
+<p align="center">
+    <img src="imagens/display7.png"width="300">
+    <br>
+<p>
+
+Para mostrar dígitos decimais e acender os segmentos certos foi utilizado um array para mapear o correspondente binário dos números de 0 a 9.
+</p>
+
+### Temporizador
+<p align="justify">
+A duração de uma partida do jogo é 60 segundos e a cada 5 segundos uma parte da barra de tempo desaparece, para que isso seja possível é preciso contar o tempo de execução do programa. Para isso, foi utilizada a biblioteca time.h e a função time(); ao salvar o valor de retorno dessa função em diferentes partes do código e depois subtrair, é possível obter o tempo que se passou em segundos entre uma e outra, essa foi a abordagem utilizada.
+
+```current_time - start_time >= 60```
+
+</p>
+
+### Regras e Jogabilidade
+--
 
 
 
 ### Fluxograma da Solução Geral do Projeto
 
 <p align="center">
-    <img src="imagens/fluxograma.png" alt="Fluxograma" width="600">
+    <img src="imagens/fluxograma_geral.png" alt="Fluxograma" width="600">
     <br>
     Figura 11. Fluxograma da Solução Geral do Projeto.
 </p>
@@ -238,7 +264,7 @@ Para que todo o fluxo funcione corretamente, alguns comandos precisam ser execut
 make
 make lib
 ```
-Os comandos irão inserir o módulo no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e o arquivo principal (main). Para mostrar a imagem no monitor, executar:
+Os comandos irão inserir o módulo do processador gráfico no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e os arquivos principal e secundários. Para mostrar a imagem no monitor, executar:
 ```bash
 sudo ./main
 ```
@@ -251,16 +277,17 @@ sudo ./main
 Os cenários de testes foram desenvolvidos para verificar as funções do projeto e se as mesmas estavam se comportando conforme o esperado. Abaixo está cada cenário de teste realizado:
 </p>
 
-<p align="center">
-    <img src="" alt=" Representação dos botões da placa DE1-Soc" width="500">
-    <br>
-    Figura X. Representação de cada botão da placa DE1-SoC
-</p>
+- Quando o programa é compilado, ele inicia na tela inicial do jogo.
 
+<p align="center">
+    <img src="imagens/tela_inicial.jpg" alt=" Tela inicial" width="400">
+    <br>
+    Figura X. Tela inicial
+    
 - Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
-    <img src="" alt="Tela do jogo" width="500">
+    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="500">
     <br>
     Figura X. Tela do jogo
 </p>
@@ -274,7 +301,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 
 - Ao pressionar o botão KEY2 na placa durante o jogo, o jogo reinicia.
 <p align="center">
-    <img src="" alt="Tela do jogo" width="500">
+    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="400">
     <br>
     Figura X. Tela do jogo ao reiniciar
 </p>
@@ -289,7 +316,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Quando o tempo de 60 segundos se esgota durante o jogo, a tela do jogo é substituída pela tela de game over.
 
 <p align="center">
-    <img src="" alt="Tela de game over" width="500">
+    <img src="imagens/game_over.jpg" alt="Tela de game over" width="400">
     <br>
     Figura X. Tela de game over
 </p>
