@@ -159,11 +159,11 @@ Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, 
 
 ### Sprites Novos
 <p align="justify">
-Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Utilizamos a ferramenta <a href="https://www.pixilart.com">Pixilart</a> para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após finalizarmos o desenho, as imagens foram salvas no formato adequado.
+Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Foi utilizada a ferramenta <a href="https://www.pixilart.com">Pixilart</a> para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após o desenho ser finalizado, as imagens foram salvas no formato adequado.
 
 </p>
 <p align="justify">
-Para o processamento das imagens, utilizamos a biblioteca <a href="https://python-pillow.org">Pillow</a>, que é amplamente usada para abrir e manipular imagens em Python. Esta biblioteca nos permitiu extrair a matriz de valores RGB de cada pixel das imagens salvas. Em seguida, esses dados foram convertidos para a linguagem C, permitindo a integração dos sprites na lógica do jogo.
+Para o processamento das imagens, foi utilizada a biblioteca <a href="https://python-pillow.org">Pillow</a>, que é amplamente usada para abrir e manipular imagens em Python. Esta biblioteca nos permitiu extrair a matriz de valores RGB de cada pixel das imagens salvas. Em seguida, esses dados foram convertidos para a linguagem C, permitindo a integração dos sprites na lógica do jogo.
 </p>
 
 - Sprites criados:
@@ -241,7 +241,7 @@ Além dessa técnica, foi empregado também o uso de máscaras de bits para cada
 Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi implementada uma máquina de estados. As transições, estados e entradas necessárias para que aconteçam estão detalhadas no diagrama a seguir:
 </p>
 <p align="center">
-    <img src="imagens/state-machine1.png"width="300">
+    <img src="imagens/state-machine1.png"width="500">
     <br>
 <p>
 
@@ -268,6 +268,7 @@ Para mostrar dígitos decimais e acender os segmentos certos, foi utilizado um a
     *HEX2_ptr = display(centena);
 
 ```
+Exemplo: entrada do array segmentos **0b1000000** => corresponde ao número 0, apenas 1 segmento está apagado (o display possui lógica invertida).
 
 </p>
 
@@ -280,7 +281,14 @@ A duração de uma partida do jogo é 60 segundos e a cada 5 segundos uma parte 
 </p>
 
 ### Regras e Jogabilidade
---
+<p align="justify">
+    O jogador deve acertar o máximo de toupeiras possível dentro do limite de tempo a fim de aumentar a pontuação, o mouse deve ser utilizado para movimentar na tela e o botão esquerdo para efetivar a jogada. Há algumas condições para que os pontos sejam contabilizados, são elas:
+</p>
+
+1. O jogo não pode estar em estado de Pause
+2. A toupeira deve estar fora do arbusto
+3. Deve ocorrer colisão entre o martelo e a toupeira
+4. Deve ocorrer clique com o botão esquerdo do mouse
 
 
 
@@ -301,7 +309,7 @@ Para que todo o fluxo funcione corretamente, alguns comandos precisam ser execut
 make
 make lib
 ```
-Os comandos irão inserir o módulo do processador gráfico no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e os arquivos principal e secundários. Para mostrar a imagem no monitor, executar:
+Os comandos irão inserir o módulo do processador gráfico no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e os arquivos principal e secundários. Para iniciar o jogo no monitor, executar:
 ```bash
 sudo ./main
 ```
