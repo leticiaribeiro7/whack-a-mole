@@ -222,7 +222,7 @@ Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi 
 ### Fluxograma da Solução Geral do Projeto
 
 <p align="center">
-    <img src="imagens/fluxograma.png" alt="Fluxograma" width="600">
+    <img src="imagens/fluxograma_geral.png" alt="Fluxograma" width="600">
     <br>
     Figura 11. Fluxograma da Solução Geral do Projeto.
 </p>
