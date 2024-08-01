@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-
+// Ponteiros voláteis para os periféricos
 volatile int* KEY_ptr;
 volatile int* HEX0_ptr; 
 volatile int* HEX1_ptr;
@@ -31,19 +31,26 @@ int segmentos[10] = {
 
 int button0, button1, button2, button3;
 
+/**
+ * \brief           Mapeia os periféricos para endereços virtuais
+ * \note            Esta função abre o arquivo /dev/mem e mapeia a ponte de luz 
+ *                  para endereços virtuais, permitindo acesso aos periféricos 
+ *                  conectados. Os ponteiros para os periféricos são inicializados
+ *                  com os endereços mapeados.
+ */
 void mapPeripherals() {
     
-    int fd = -1; // used to open /dev/mem
-    void *LW_virtual; // virtual address for light-weight bridge
+    int fd = -1; // usado para abrir /dev/mem
+    void *LW_virtual; // Endereço virtual para a ponte
 
 
-    // Open /dev/mem to give access to physical addresses
+    // Abre /dev/mem para dar acesso aos endereços físicos
     if ((fd = open("/dev/mem", (O_RDWR | O_SYNC))) == -1) {
         printf("ERROR: could not open \"/dev/mem\"\n");
         return;
     }
 
-    // Get a mapping from physical addresses to virtual addresses
+    // Obtém um mapeamento de endereços físicos para endereços virtuais
     LW_virtual = mmap(NULL, LW_BRIDGE_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, LW_BRIDGE_BASE);
     if (LW_virtual == MAP_FAILED) {
         printf("ERROR: mmap() failed\n");
@@ -51,7 +58,7 @@ void mapPeripherals() {
         return;
     }
 
-    // Set virtual address pointer to I/O port (LEDR_BASE is assumed to be defined)
+    // Define ponteiros para os endereços I/O (LEDR_BASE é assumido como definido)
     KEY_ptr = (int *)(LW_virtual + KEYS_BASE);
     HEX0_ptr = (int *)(LW_virtual + HEX0_BASE);
     HEX1_ptr = (int *)(LW_virtual + HEX1_BASE);
@@ -62,6 +69,14 @@ void mapPeripherals() {
 
 }
 
+/**
+ * \brief           Limita a posição do cursor dentro dos limites especificados
+ * \param[in,out]   x: Posição horizontal do cursor a ser limitada
+ * \param[in,out]   y: Posição vertical do cursor a ser limitada
+ * \note            Esta função ajusta a posição do cursor para garantir que ele
+ *                  permaneça dentro dos limites de 1 a 620 para x e de 1 a 461
+ *                  para y.
+ */
 void limitarCursor(int *x, int *y) {
     if (*x <= 1) *x = 1;
     if (*y <= 1) *y = 1;
@@ -69,6 +84,12 @@ void limitarCursor(int *x, int *y) {
     if (*y >= 461) *y = 461;
 }
 
+/**
+ * \param[in]       number: Número a ser convertido e exibido
+ * \return          Valor binário correspondente ao número que será exibido nos segmentos
+ * \note            Esta função retorna a representação binária do número fornecido
+ *                  para ser exibida nos segmentos.
+ */
 uint8_t display(int number) {
     return segmentos[number];
 }
