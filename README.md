@@ -176,7 +176,9 @@ O sprite do martelo é atualizado com as novas coordenadas utilizando a função
 
 **Movimentação das Toupeiras**
 <p align="justify">
-No jogo, as toupeiras se movem verticalmente dentro de limites definidos por valores máximos (max_y) e mínimos (min_y). Cada toupeira possui um intervalo de movimentação aleatório entre 1 e 3 segundos, determinado pela expressão: ``` toupeiras[i]->interval = rand() % 3 + 1 ```.
+No jogo, as toupeiras se movem verticalmente dentro de limites definidos por valores máximos (max_y) e mínimos (min_y). Cada toupeira possui um intervalo de movimentação aleatório entre 1 e 3 segundos, determinado pela expressão:
+
+ ``` toupeiras[i]->interval = rand() % 3 + 1 ```.
 <p>
 <p align="justify">
 As toupeiras se movem para cima até atingirem o limite mínimo (min_y). Ao alcançar esse limite, elas invertem a direção e começam a descer. Durante esse tempo, as toupeiras continuam a se mover até atingirem o limite máximo (max_y).
@@ -184,6 +186,43 @@ As toupeiras se movem para cima até atingirem o limite mínimo (min_y). Ao alca
 <p align="justify">
 Para controlar a direção das toupeiras, é utilizada uma variável chamada direction. Quando uma toupeira atinge o limite mínimo (min_y), direction é definida como -1, fazendo com que a toupeira desça. Quando a toupeira atinge o limite máximo (max_y), direction é definida como 1, fazendo com que a toupeira suba. 
 <p>
+
+### Uso dos botões
+<p align="justify">
+A placa possui 4 push buttons, todos foram utilizados. Cada função do jogo foi atribuída a um botão, da seguinte forma:
+
+- Botão 0: Iniciar
+- Botão 1: Pausar/Despausar
+- Botão 2: Reiniciar
+- Botão 3: Encerrar
+</p>
+
+<p align="justify">
+A detecção do pressionamento dos botões se mostrou um desafio pois a função de pausar/despausar estava registrando multiplos cliques sendo que o botão só havia sido pressionado uma vez, impossibilitando que o jogo saísse do estado de Pause. Isso acontece pois a leitura acontece muito rápido e várias vezes antes mesmo que o botão seja liberado. 
+</p>
+<p align="justify">
+Para contornar o problema, foi adicionado um loop verificando se o valor do botão ainda consta como pressionado, se sim, a leitura dos botões é feita novamente até que seja lido como não pressionado, significando que já foi liberado. Essa transição ocorre muito rápido e não trouxe prejuízo para o desempenho do código.
+</p>
+<p align="justify">
+Além dessa técnica, foi empregado também o uso de máscaras de bits para cada um dos botões. Sabe-se que estes possuem lógica invertida, ou seja, possui valor 1 quando não pressionado e 0 quando pressionado. Está disponivel na placa De1SOC um ponteiro KEYS que contém os valores dos 4 botões, portanto as máscaras também possuem 4 bits, como no exemplo:
+</p>
+<p align="center">
+    <img src="imagens/button-detection.png"width="300">
+    <br>
+<p>
+
+<p align="justify">
+É mostrado uma operação AND entre o valor do ponteiro KEYS e máscara de bits para o botão 2. Na implementação deste projeto, é verificado se o resultado da operação é igual a 0, o que significa que o botão foi pressionado, qualquer outro valor significa que não foi pressionado. Seguindo o mesmo raciocínio, a máscara para o botão 0 seria 0001 e assim sucessivamente.
+</p>
+<p align="justify">
+Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi implementada uma máquina de estados. As transições, estados e entradas necessárias para que aconteçam estão detalhadas no diagrama a seguir:
+</p>
+<p align="center">
+    <img src="imagens/state-machine.png"width="300">
+    <br>
+<p>
+
+
 
 ### Fluxograma da Solução Geral do Projeto
 
