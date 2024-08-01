@@ -4,7 +4,7 @@
 ## Sobre
 
 <p align="justify"> 
-O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no [projeto de comunicação com o processador gráfico](https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre). 
+O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no <a href=“https://github.com/vitoriatanan/Processador-Grafico/tree/main? tab=readme-ov-file#sobre“>projeto de comunicação com o processador gráfico</a>. 
 <p>
 
 <p align="justify">
@@ -37,6 +37,8 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Módulo de Kernel]
 
 - [Uso de Threads]
+    - Thread1 - Movimento do Martelo
+    - Thread2 - Movimento das Toupeiras
 
 - [Implementação do Jogo]
     - Srites novas
