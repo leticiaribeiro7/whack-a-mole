@@ -309,7 +309,7 @@ Para que todo o fluxo funcione corretamente, alguns comandos precisam ser execut
 make
 make lib
 ```
-Os comandos irão inserir o módulo do processador gráfico no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e os arquivos principal e secundários. Para iniciar o jogo no monitor, executar:
+O comando **make** irá inserir o módulo do processador gráfico no kernel e criar o arquivo especial na pasta /dev. O **make lib** irá compilar a biblioteca e os arquivos principal e secundários. Para iniciar o jogo no monitor, executar:
 ```bash
 sudo ./main
 ```
