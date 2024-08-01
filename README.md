@@ -272,7 +272,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 
 - Ao pressionar o botão KEY2 na placa durante o jogo, o jogo reinicia.
 <p align="center">
-    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="500">
+    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="400">
     <br>
     Figura X. Tela do jogo ao reiniciar
 </p>
@@ -287,7 +287,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Quando o tempo de 60 segundos se esgota durante o jogo, a tela do jogo é substituída pela tela de game over.
 
 <p align="center">
-    <img src="" alt="Tela de game over" width="500">
+    <img src="imagens/game_over.jpg" alt="Tela de game over" width="400">
     <br>
     Figura X. Tela de game over
 </p>
