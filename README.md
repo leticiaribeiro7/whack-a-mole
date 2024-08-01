@@ -245,7 +245,7 @@ A duração de uma partida do jogo é 60 segundos e a cada 5 segundos uma parte 
 ### Fluxograma da Solução Geral do Projeto
 
 <p align="center">
-    <img src="imagens/fluxograma.png" alt="Fluxograma" width="600">
+    <img src="imagens/fluxograma_geral.png" alt="Fluxograma" width="600">
     <br>
     Figura 11. Fluxograma da Solução Geral do Projeto.
 </p>
@@ -272,12 +272,13 @@ sudo ./main
 Os cenários de testes foram desenvolvidos para verificar as funções do projeto e se as mesmas estavam se comportando conforme o esperado. Abaixo está cada cenário de teste realizado:
 </p>
 
-<p align="center">
-    <img src="" alt=" Representação dos botões da placa DE1-Soc" width="500">
-    <br>
-    Figura X. Representação de cada botão da placa DE1-SoC
-</p>
+- Quando o programa é compilado, ele inicia na tela inicial do jogo.
 
+<p align="center">
+    <img src="imagens/tela_inicial.jpg" alt=" Tela inicial" width="400">
+    <br>
+    Figura X. Tela inicial
+    
 - Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
