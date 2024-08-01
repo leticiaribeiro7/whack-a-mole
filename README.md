@@ -3,7 +3,7 @@
 ## Sobre
 
 <p align="justify"> 
-O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no [projeto de comunicação com o processador gráfico](https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre). 
+O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no <a href="https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre">projeto de comunicação com o processador gráfico</a>.
 <p>
 
 <p align="justify">
