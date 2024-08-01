@@ -249,40 +249,51 @@ sudo ./main
 Os cenários de testes foram desenvolvidos para verificar as funções do projeto e se as mesmas estavam se comportando conforme o esperado. Abaixo está cada cenário de teste realizado:
 </p>
 
-<p align="justify">
-<b>Exibição da cor do background da tela:</b> 
-
-Para configurar a cor de fundo da tela, foi utilizada a função ```set_background_color(int R, int G, int B)```. Essa função escreve no registrado necessário para definir a cor de fundo. No projeto, a cor escolhida foi azul, representando o céu diurno. A figura abaixo exemplifica como ficaria a cor do background no monitor
-
 <p align="center">
-    <img src="Imagens/background cor monitor desenho.png" alt="Função Background Color" width="500">
+    <img src="" alt=" Representação dos botões da placa DE1-Soc" width="500">
     <br>
-    Figura 13. Exemplo da cor de Background no monitor
+    Figura X. Representação de cada botão da placa DE1-SoC
 </p>
 
-<p align="justify">
-<b>Desenho de background blocks:</b> 
-
-O desenho de blocos no background foi realizado utilizando a função ```set_background_block(int endereco_memoria, int R, int G, int B)```. Essa função permite desenhar elementos como a grama e a tartaruga (exceto suas patas) na memória de background. Para facilitar o processo, um laço ```for``` foi utilizado para definir as áreas na memória onde esses blocos deveriam ser desenhados. A Figura 14 mostra um exemplo de como deveria ficar o desenho usando os background blocks.
+- Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
-    <img src="Imagens/background block monitor desenho.png" alt="Função Background Block" width="500">
+    <img src="" alt="Tela do jogo" width="500">
     <br>
-    Figura 14. Exemplo do desenho utilizando apenas os blocos
-<p>
-
-
-
-<p align="justify">
-<b>Configuração de sprites:</b> 
-
-A função ```set_sprite(int reg, int x, int y, int offset, int activation_bit)``` foi empregada para configurar e exibir sprites na tela. A Figura 16 demonstra um exemplo final do desenho com sprites.
-
-<p align="center">
-    <img src="Imagens/sprites desenho monitor.png" alt="Função de Sprites" width="500">
-    <br>
-    Figura 16. Exemplo desenho final com os sprites
+    Figura X. Tela do jogo
 </p>
+
+- Ao pressionar o botão KEY1 na placa durante o jogo, o jogo é pausado. Pressionando novamente, o jogo é retomado, voltando à jogabilidade normal.
+<p align="center">
+    <img src="imagens/tela_pause.jpg" alt="Tela do jogo pausado" width="500">
+    <br>
+    Figura X. Tela do jogo pausado
+</p>
+
+- Ao pressionar o botão KEY2 na placa durante o jogo, o jogo reinicia.
+<p align="center">
+    <img src="" alt="Tela do jogo" width="500">
+    <br>
+    Figura X. Tela do jogo ao reiniciar
+</p>
+
+- Ao pressionar o botão KEY3 na placa durante o jogo, o jogo é encerrado.
+<p align="center">
+    <img src="" alt="Tela do encerramento" width="500">
+    <br>
+    Figura X. Tela do jogo ao encerrar
+</p>
+
+- Quando o tempo de 60 segundos se esgota durante o jogo, a tela do jogo é substituída pela tela de game over.
+
+<p align="center">
+    <img src="" alt="Tela de game over" width="500">
+    <br>
+    Figura X. Tela de game over
+</p>
+
+- Ao clicar com o botão esquerdo do mouse nas toupeiras que aparecem durante o jogo, os pontos são atualizados no display de 7 segmentos.
+
 
 ## Conclusão
 
