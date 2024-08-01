@@ -249,12 +249,13 @@ sudo ./main
 Os cenários de testes foram desenvolvidos para verificar as funções do projeto e se as mesmas estavam se comportando conforme o esperado. Abaixo está cada cenário de teste realizado:
 </p>
 
-<p align="center">
-    <img src="" alt=" Representação dos botões da placa DE1-Soc" width="500">
-    <br>
-    Figura X. Representação de cada botão da placa DE1-SoC
-</p>
+- Quando o programa é compilado, ele inicia na tela inicial do jogo.
 
+<p align="center">
+    <img src="imagens/tela_inicial.jpg" alt=" Tela inicial" width="400">
+    <br>
+    Figura X. Tela inicial
+    
 - Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
