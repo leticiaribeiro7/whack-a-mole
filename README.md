@@ -164,6 +164,81 @@ As toupeiras são elementos passivos, que significa que não precisam de ação 
 Para implementar essa funcionalidade, foram utilizadas as funções pthread_create e pthread_join da biblioteca pthread. A função pthread_create é responsável por criar uma nova thread, enquanto pthread_join aguarda a conclusão da thread.
 <p>
 
+**pthread_create:**
+<p align="justify">
+A sintaxe da função para criar uma nova thread é:
+
+```c
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void*), void *arg);
+```
+<p>
+
+<p align="justify">
+
++ ***thread**: Ponteiro para uma variável do tipo pthread_t onde o identificador da nova thread será armazenado.
+<p>
+
+<p align="justify">
+
++ ***attr**: Ponteiro para um objeto pthread_attr_t que especifica os atributos da thread. Se NULL, a thread é criada com atributos padrão.
+<p>
+
+<p align="justify">
+
++ **start_routine**: Função que a thread executará. Deve aceitar um argumento do tipo void* e retornar um valor do tipo void*.
+<p>
+
+<p align="justify">
+
++ **arg**: Argumento passado para a função start_routine.
+<p>
+
+<p align="justify">
+No contexto do projeto, a criação de uma nova thread é feita da seguinte maneira:
+<p>
+
+```c
+if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)args) != 0) {
+    perror("Failed to create thread 1");
+    return 1;
+}
+```
+<p align="justify">
+Nesse trecho de código, thread1 é o identificador da nova thread, NULL indica que a thread será criada com atributos padrão, movimentoToupeira é a função que a thread executará e args é o argumento passado para essa função. Um processo similar é utilizado para criar thread2.
+<p>
+
+**pthread_join:**
+
+<p align="justify">
+A Sintaxe utilizada para thread que espera que uma thread termine sua execução é:
+<p>
+
+```c
+int pthread_join(pthread_t thread, void **value_ptr);
+```
+<p align="justify">
+
++ **thread**: Identificador da thread que se deseja esperar.
+<p>
+
+<p align="justify">
+
++ **value_ptr**: Se não for NULL, é usado para armazenar o valor retornado pela função da thread.
+<p>
+
+<p align="justify">
+No contexto do projeto, pthread_join é utilizado da seguinte maneira:
+<p>
+
+```c
+if (pthread_join(thread1, NULL) != 0) {
+    perror("Failed to join thread 1");
+    return 1;
+    }
+```
+<p align="justify">
+Isso garante que o processo principal aguardará a conclusão da thread1. O mesmo procedimento é aplicado para thread2.
+<p>
 
 **Thread1 - Movimento do Martelo**
 
