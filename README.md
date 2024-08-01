@@ -259,7 +259,7 @@ Para que todo o fluxo funcione corretamente, alguns comandos precisam ser execut
 make
 make lib
 ```
-Os comandos irão inserir o módulo no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e o arquivo principal (main). Para mostrar a imagem no monitor, executar:
+Os comandos irão inserir o módulo do processador gráfico no kernel e criar o arquivo especial na pasta /dev. Também irá compilar a biblioteca e os arquivos principal e secundários. Para mostrar a imagem no monitor, executar:
 ```bash
 sudo ./main
 ```
