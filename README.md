@@ -344,7 +344,7 @@ sudo ./main
 </p>
 
 
-## Cenário de Testes
+## Cenários de Testes
 
 <p align="justify">
 Os cenários de testes foram desenvolvidos para verificar as funções do projeto e se as mesmas estavam se comportando conforme o esperado. Abaixo está cada cenário de teste realizado:
