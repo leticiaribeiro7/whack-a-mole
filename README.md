@@ -36,7 +36,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Módulo de Kernel]
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - [Sprites Novos](#sprites-novos)
+    - [Sprites Novos e Telas do Jogo](#sprites-novos-e-telas-do-jogo)
     - [Colisão](#colisão)
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
@@ -166,7 +166,7 @@ Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, 
 
 ## Implementação do Jogo
 
-### Sprites Novos
+### Sprites Novos e Telas do Jogo
 <p align="justify">
 Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Foi utilizada a ferramenta <a href="https://www.pixilart.com">Pixilart</a> para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após o desenho ser finalizado, as imagens foram salvas no formato adequado.
 
@@ -196,12 +196,16 @@ Para o processamento das imagens, foi utilizada a biblioteca <a href="https://py
    Figura X. Sprite de toupeira
 </p>
 
+<p align="justify">
+As telas do jogo (vide seção <a href="https://github.com/leticiaribeiro7/whack-a-mole/blob/main/README.md#cen%C3%A1rios-de-testes">Cenários de Teste</a>) também foram feitas com a mesma abordagem dos sprites, porém os desenhos foram feitos em tamanho 80x60, dado que o monitor com VGA possui 640x480 pixels e cada bloco personalizável do processador gráfico tem tamanho 8x8. O código em Python está preparado para receber qualquer tamanho de imagem, basta passar por parâmetro a largura e a altura desejada.
+</p>
+
 ### Colisão
 <p align="justify">
     A colisão é um princípio básico nos jogos, neste contexto foi necessário saber quando o martelo colide com a toupeira. Para implementar isso, foi usado um conceito chamado Axis-Aligned Bounding Box (Caixa Delimitadora Alinhada aos Eixos), uma forma de colisão retangular alinhada aos eixos base da cena, que em 2D se alinha aos eixos x e y. Estar alinhada aos eixos significa que a caixa retangular não possui rotação e suas bordas são paralelas aos eixos base da cena (por exemplo, as bordas esquerda e direita são paralelas ao eixo y). O fato dessas caixas estarem sempre alinhadas aos eixos da cena facilita os cálculos.
 </p>
 <p align="justify">
-    Uma colisão ocorre quando dois elementos entram nas regiões um do outro, é determinado se o primeiro objeto está de alguma forma dentro do espaço do segundo objeto (nesse caso, ambos os objetos tem tamanho 20x20). Então, verificamos se as bordas horizontais e as bordas verticais dos dois objetos se sobrepõem, se sim, ocorreu uma colisão.
+    Uma colisão ocorre quando dois elementos entram nas regiões um do outro, é determinado se o primeiro objeto está de alguma forma dentro do espaço do segundo objeto (nesse caso, ambos os objetos tem tamanho 20x20). Essa verificação ocorre analisando se as bordas horizontais e as bordas verticais dos dois objetos se sobrepõem, se sim, ocorreu uma colisão.
 </p>
 
 <p align="center">
