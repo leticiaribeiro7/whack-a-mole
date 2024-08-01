@@ -265,7 +265,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 
 - Ao pressionar o botão KEY1 na placa durante o jogo, o jogo é pausado. Pressionando novamente, o jogo é retomado, voltando à jogabilidade normal.
 <p align="center">
-    <img src="imagens/tela_pause.jpg" alt="Tela do jogo pausado" width="500">
+    <img src="imagens/tela_pause.jpg" alt="Tela do jogo pausado" width="400">
     <br>
     Figura X. Tela do jogo pausado
 </p>
