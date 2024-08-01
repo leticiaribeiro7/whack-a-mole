@@ -37,7 +37,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - [Sprites novos](#sprites-novas)
+    - [Sprites novos](#sprites-novos)
     - Colisão 
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
@@ -157,7 +157,7 @@ Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, 
 
 ## Implementação do Jogo
 
-### Novos Sprites
+### Sprites Novos
 <p align="justify">
 Para compor o jogo, foram criados três sprites na memória de sprites: martelo, arbusto e toupeira. Na criação dos sprites, foi utilizada a ferramenta Pixilart com a dimensão de 20x20 pixels. O desenho foi realizado pixel a pixel, a imagem foi salva e uma matriz R, G e B foi gerada em Python, que posteriormente foi convertida para a linguagem C.
 </p>
