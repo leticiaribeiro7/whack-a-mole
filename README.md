@@ -115,7 +115,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 
 ### Mouse
 <p align="justify">
-    Um mouse é utilizado como dispositivo de entrada para o jogador. Com o botão esquerdo, o jogador clica nas toupeiras para jogar, enquanto o movimento do mouse permite um controle mais rápido e preciso. O mouse é conectado a placa por meio de uma porta USB.
+    Um mouse é utilizado como dispositivo de entrada para interagir com as toupeiras que aparecem aleatoriamente na tela. O botão esquerdo do mouse é usado para acertar as toupeiras, acumulando pontos a cada acerto bem-sucedido e o movimento do mouse controla a posição de um martelo na tela, permitindo ao jogador responder rapidamente às ações do jogo. O mouse está conectado à placa por meio de uma porta USB e a lógica do funcionamento do mouse é gerenciada por uma thread. 
 </p>
 <p align="center">
     <img src="imagens/mouse.jpg" alt="Mouse conectado na placa" width="500">
