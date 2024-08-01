@@ -50,6 +50,14 @@ int segmentos[10] = {
     0b0010000
 };
 
+/**
+ * \brief Função que lê o estado dos botões e atualiza as variáveis correspondentes
+ * 
+ * Esta função lê os valores dos botões conectados ao dispositivo e 
+ * atualiza as variáveis button0, button1, button2 e button3 com base 
+ * no estado de cada botão. Cada botão é mapeado para um bit específico
+ * na variável KEY_ptr.
+ */
 void readButtons() {
     button0 = ((*KEY_ptr & 0b0001) == 0); // iniciar
     button1 = ((*KEY_ptr & 0b0010) == 0); // pausar
@@ -57,7 +65,13 @@ void readButtons() {
     button3 = ((*KEY_ptr & 0b1000) == 0); // parar
 }
 
-
+/**
+ * \brief Função que desenha a tela do jogo
+ * 
+ * Esta função percorre um array que contém os valores RGB para 
+ * cada pixel na tela do jogo. Em seguida, chama a função set_background_block 
+ * para definir a cor de fundo de cada bloco na tela de acordo com os valores RGB.
+ */
 void draw_game_screen() {
     int i;
     for (i = 0; i < 4800; i++) {
@@ -67,6 +81,14 @@ void draw_game_screen() {
         set_background_block(i, R, G, B);
     }
 }
+
+/**
+ * \brief Função que desenha a tela de "game over"
+ * 
+ * Esta função percorre um array que contém os valores RGB para 
+ * cada pixel na tela de game over. Em seguida, chama a função set_background_block 
+ * para definir a cor de fundo de cada bloco na tela de acordo com os valores RGB.
+ */
 // column + line*80
 void draw_game_over_screen() {
     int i;
@@ -78,6 +100,12 @@ void draw_game_over_screen() {
     }
 }
 
+/**
+ * \brief Função que remove os blocos de pausa
+ * 
+ * Esta função define os blocos de fundo nas posições especificadas para as 
+ * cores fornecidas (1, 4, 6), removendo assim a indicação de pausa na tela.
+ */
 void remove_pause_blocks() {
     set_background_block(162, 1, 4, 6);
     set_background_block(164, 1, 4, 6);
@@ -87,6 +115,12 @@ void remove_pause_blocks() {
     set_background_block(324, 1, 4, 6);
 }
 
+/**
+ * \brief Função que desenha os blocos de pausa
+ * 
+ * Esta função define os blocos de fundo nas posições especificadas para as 
+ * cores fornecidas (7, 1, 1), indicando assim a pausa na tela.
+ */
 void draw_pause_blocks() {
     set_background_block(162, 7, 1, 1);
     set_background_block(164, 7, 1, 1);
@@ -97,6 +131,16 @@ void draw_pause_blocks() {
 }
 
 
+/**
+ * \brief Função que controla o movimento das toupeiras
+ * 
+ * Esta função é executada em uma thread separada e controla o movimento das toupeiras 
+ * no jogo. Ela utiliza um array de sprites de toupeiras e arbustos. Além disso, movimenta as 
+ * toupeiras de acordo com um intervalo aleatório de tempo.
+ * 
+ * \param[in] arg : Argumentos passados para a thread, contendo os arrays de toupeiras e arbustos
+ * \return NULL
+ */
 void* movimentoToupeira(void* arg) {
     void** args = (void**)arg;
 
@@ -113,10 +157,17 @@ void* movimentoToupeira(void* arg) {
 
     uint16_t base_block_address = 315; /* Endereço do último bloco na barra de tempo */
 
+  
     while (1) {
         // Escuta os botões
         readButtons();
-
+        /**
+         * \brief Inicia o jogo se o botão de iniciar for pressionado e o estado for START
+         * 
+         * Quando o botão de iniciar (button0) é pressionado e o estado atual é START, 
+         * a função limpa o bloco de fundo, desenha a tela do jogo e define o estado para RUNNING.
+         * O tempo de início e o último tempo de verificação são registrados.
+         */
         if (button0 && state == START) { // inicia se ainda nao tiver iniciado
             clear_background_block();
             draw_game_screen();
@@ -125,6 +176,12 @@ void* movimentoToupeira(void* arg) {
             last_check_time = time(NULL);
         }
 
+        /**
+         * \brief Pausa o jogo se o botão de pausar for pressionado e o estado for RUNNING
+         * 
+         * Quando o botão de pausar (button1) é pressionado e o estado atual é RUNNING, 
+         * a função define o estado para PAUSED, desenha os blocos de pausa e registra o tempo de pausa.
+         */
         if (button1 && state == RUNNING) { // so pausa se tiver rodando
             state = PAUSED; //pausado
             draw_pause_blocks();
@@ -138,12 +195,25 @@ void* movimentoToupeira(void* arg) {
 
         readButtons();
 
+        /**
+         * \brief Retorna do estado de pausa se o botão de pausar for pressionado novamente e o estado for PAUSED
+         * 
+         * Quando o botão de pausar (button1) é pressionado novamente e o estado atual é PAUSED, 
+         * a função define o estado para RUNNING, remove os blocos de pausa e ajusta o tempo total de pausa.
+         */
         if (button1 && state == PAUSED) { // retorna da pausa se tiver pausado
             state = RUNNING;
             remove_pause_blocks();
             total_pause_time += time(NULL) - pause_time;
         }
 
+        /**
+         * \brief Reinicia o jogo se o botão de reiniciar for pressionado
+         * 
+         * Quando o botão de reiniciar (button2) é pressionado, a função redefine o endereço do bloco base, 
+         * define o estado para RUNNING, reinicia a pontuação, o tempo total de pausa, o tempo de início e o 
+         * último tempo de verificação. Em seguida, redesenha a tela do jogo.
+         */
         if (button2) { // restart
             base_block_address = 315;
             state = RUNNING;
@@ -154,6 +224,12 @@ void* movimentoToupeira(void* arg) {
             draw_game_screen(); // redesenha a tela do game
         }
 
+        /**
+         * \brief Encerra o jogo se o botão de parar for pressionado
+         * 
+         * Quando o botão de parar (button3) é pressionado em qualquer estado, 
+         * a função define o estado para ENDED_BY_BUTTON, limpa os sprites e o bloco de fundo, e sai do loop.
+         */
         if (button3) { // encerra em qualquer state
             state = ENDED_BY_BUTTON; //encerrado
             clear_sprite();
