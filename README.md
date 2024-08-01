@@ -258,7 +258,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
-    <img src="" alt="Tela do jogo" width="500">
+    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="500">
     <br>
     Figura X. Tela do jogo
 </p>
@@ -272,7 +272,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 
 - Ao pressionar o botão KEY2 na placa durante o jogo, o jogo reinicia.
 <p align="center">
-    <img src="" alt="Tela do jogo" width="500">
+    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="500">
     <br>
     Figura X. Tela do jogo ao reiniciar
 </p>
