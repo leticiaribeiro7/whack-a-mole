@@ -159,14 +159,14 @@ Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, 
 
 ### Sprites Novos
 <p align="justify">
-Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Utilizamos a ferramenta[Pixilart](https://www.pixilart.com) para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após finalizarmos o desenho, as imagens foram salvas no formato adequado.
+Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Utilizamos a ferramenta <a href="https://www.pixilart.com">Pixilart</a> para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após finalizarmos o desenho, as imagens foram salvas no formato adequado.
 
 </p>
 <p align="justify">
-Para o processamento das imagens, utilizamos a biblioteca Pillow, que é amplamente usada para abrir e manipular imagens em Python. Esta biblioteca nos permitiu extrair a matriz de valores RGB de cada pixel das imagens salvas. Em seguida, esses dados foram convertidos para a linguagem C, permitindo a integração dos sprites na lógica do jogo.
+Para o processamento das imagens, utilizamos a biblioteca <a href="https://python-pillow.org">Pillow</a>, que é amplamente usada para abrir e manipular imagens em Python. Esta biblioteca nos permitiu extrair a matriz de valores RGB de cada pixel das imagens salvas. Em seguida, esses dados foram convertidos para a linguagem C, permitindo a integração dos sprites na lógica do jogo.
 </p>
 
-- Sprite de martelo:
+- Sprites criados:
 <p align="center">
     <img src="sprites/martelo.png"width="60">
     <br>
@@ -174,7 +174,6 @@ Para o processamento das imagens, utilizamos a biblioteca Pillow, que é amplame
     
 </p>
 
-- Sprite de arbusto:
 <p align="center">
     <img src="sprites/arbusto.png"width="60">
     <br>
@@ -182,7 +181,6 @@ Para o processamento das imagens, utilizamos a biblioteca Pillow, que é amplame
     
 </p>
 
-- Sprite de toupeira:
 <p align="center">
     <img src="sprites/toupeira.png"width="60">
     <br>
