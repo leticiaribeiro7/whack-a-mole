@@ -1,10 +1,14 @@
-<h1 align="center"> Whack-a-Mole - Jogo 2D</h1>
+<h1 align="center"> Whack a Mole - Jogo 2D</h1>
 
 
 ## Sobre
 
 <p align="justify"> 
 O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no [projeto de comunicação com o processador gráfico](https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre). 
+<p>
+
+<p align="justify">
+Inspirado em um clássico arcade, o jogo simula o desafio de acertar o maior número possível de toupeiras que surgem aleatoriamente acima de arbustos na tela. O jogador deve usar um martelo controlado pelo mouse para acertar as toupeiras e acumular pontos dentro de um limite de tempo de 1 minuto.
 <p>
 
 <p align="justify">
@@ -30,6 +34,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Padrão VGA](#padrão-vga)
     - [Mouse]
     - [Processador Gráfico]
+    - [Módulo de Kernel]
 
 - [Uso de Threads]
 
@@ -120,6 +125,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
     Figura 4. Estrutura Interna do Processador Gráfico. (Fonte: TCC de [Gabriel B. Alves])
 </p>
 
+### Módulo de Kernel
 
 
 ## Threads
