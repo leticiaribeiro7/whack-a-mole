@@ -135,7 +135,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 <p align="center">
     <img src="imagens/arquitetura_processador.png" alt="VGA" width="500">
     <br>
-    Figura 4. Estrutura Interna do Processador Gráfico. (Fonte: TCC de [Gabriel B. Alves])
+    Figura 5. Estrutura Interna do Processador Gráfico. (Fonte: TCC de [Gabriel B. Alves])
 </p>
 
 ### Módulo de Kernel
@@ -301,21 +301,21 @@ Para o processamento das imagens, foi utilizada a biblioteca <a href="https://py
 <p align="center">
     <img src="sprites/martelo.png"width="60">
     <br>
-   Figura X. Sprite de martelo
+   Figura 6. Sprite de martelo
     
 </p>
 
 <p align="center">
     <img src="sprites/arbusto.png"width="60">
     <br>
-   Figura X. Sprite de arbusto
+   Figura 7. Sprite de arbusto
     
 </p>
 
 <p align="center">
     <img src="sprites/toupeira.png"width="60">
     <br>
-   Figura X. Sprite de toupeira
+   Figura 8. Sprite de toupeira
 </p>
 
 <p align="justify">
@@ -333,7 +333,7 @@ As telas do jogo (vide seção <a href="https://github.com/leticiaribeiro7/whack
 <p align="center">
     <img src="imagens/colisao.png"width="500">
     <br>
-   Figura X. Exemplo de colisão de quadrados na terceira figura
+   Figura 9. Exemplo de colisão de quadrados na terceira figura
     
 </p>
 
@@ -382,6 +382,7 @@ Além dessa técnica, foi empregado também o uso de máscaras de bits para cada
 <p align="center">
     <img src="imagens/button-detection.png"width="300">
     <br>
+    Figura 10. Máscara de bits dos botões
 <p>
 
 <p align="justify">
@@ -393,6 +394,7 @@ Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi 
 <p align="center">
     <img src="imagens/state-machine1.png"width="500">
     <br>
+    Figura 11. Máquina de Estados dos botões
 <p>
 
 ### Display 7 Segmentos
@@ -447,7 +449,7 @@ A duração de uma partida do jogo é 60 segundos e a cada 5 segundos uma parte 
 <p align="center">
     <img src="imagens/fluxograma_geral.png" alt="Fluxograma" width="600">
     <br>
-    Figura 11. Fluxograma da Solução Geral do Projeto.
+    Figura 12. Fluxograma da Solução Geral do Projeto.
 </p>
 
 
@@ -477,28 +479,28 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 <p align="center">
     <img src="imagens/tela_inicial.jpg" alt=" Tela inicial" width="400">
     <br>
-    Figura X. Tela inicial
+    Figura 13. Tela inicial
     
 - Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
     <img src="gifs/jogo.gif" alt="Tela do jogo" width="500">
     <br>
-    Figura X. Tela do jogo
+    Figura 14. Tela do jogo
 </p>
 
 - Ao pressionar o botão KEY1 na placa durante o jogo, o jogo é pausado. Pressionando novamente, o jogo é retomado, voltando à jogabilidade normal.
 <p align="center">
     <img src="imagens/tela_pause.jpg" alt="Tela do jogo pausado" width="400">
     <br>
-    Figura X. Tela do jogo pausado
+    Figura 15. Tela do jogo pausado
 </p>
 
 - Ao pressionar o botão KEY2 na placa durante o jogo, o jogo reinicia.
 <p align="center">
     <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="400">
     <br>
-    Figura X. Tela do jogo ao reiniciar
+    Figura 16. Tela do jogo ao reiniciar
 </p>
 
 - Quando o tempo de 60 segundos se esgota durante o jogo, a tela do jogo é substituída pela tela de game over.
@@ -506,7 +508,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 <p align="center">
     <img src="gifs/game-over.gif" alt="Tela de game over" width="400">
     <br>
-    Figura X. Tela de game over
+    Figura 17. Tela de game over
 </p>
 
 - Ao clicar com o botão esquerdo do mouse nas toupeiras que aparecem durante o jogo, os pontos são atualizados no display de 7 segmentos.
@@ -514,7 +516,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 <p align="center">
     <img src="gifs/display7.gif" alt="Pontuação no display 7 segmentos" width="300">
     <br>
-    Figura X. Pontuação no display 7 segmentos
+    Figura 18. Pontuação no display 7 segmentos
 </p>
 
 
