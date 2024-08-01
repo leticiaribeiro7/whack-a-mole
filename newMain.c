@@ -6,7 +6,6 @@
 #include <sys/mman.h>
 #include <stdint.h>
 
-#include "headers/screens.h"
 #include "headers/utils.h"
 #include "headers/screensRGB.h"
 #include "headers/spritesRGB.h"
@@ -25,7 +24,6 @@
 extern volatile int* HEX0_ptr;
 extern volatile int* HEX1_ptr;
 extern volatile int* HEX2_ptr;
-
 extern volatile int* HEX3_ptr;
 extern volatile int* HEX4_ptr;
 extern volatile int* HEX5_ptr;
@@ -33,10 +31,11 @@ extern volatile int* HEX5_ptr;
 extern volatile int* KEY_ptr;
 
 int button0, button1, button2, button3;
-int state = 0; // pra acontecer as trocas de tela de acordo ao estado
+int state = 0; /* Controladora de estado*/
 int pontuacao = 0;
 
 
+/* Array para mapeamento dos segmentos em binário para decimal */
 int segmentos[10] = {
     0b1000000,
     0b1111001,
@@ -63,6 +62,24 @@ void readButtons() {
     button1 = ((*KEY_ptr & 0b0010) == 0); // pausar
     button2 = ((*KEY_ptr & 0b0100) == 0); // reiniciar
     button3 = ((*KEY_ptr & 0b1000) == 0); // parar
+}
+
+
+/**
+ * \brief Função que desenha a tela inicial
+ * 
+ * Esta função percorre um array que contém os valores RGB para 
+ * cada pixel na tela de início. Em seguida, chama a função set_background_block 
+ * para definir a cor de fundo de cada bloco na tela de acordo com os valores RGB.
+ */
+void draw_initial_screen() {
+    int i;
+    for (i = 0; i < 4800; i++) {
+        int R = initialScreen[i][0];
+        int G = initialScreen[i][1];
+        int B = initialScreen[i][2];
+        set_background_block(i, R, G, B);
+    }
 }
 
 /**
@@ -159,7 +176,7 @@ void* movimentoToupeira(void* arg) {
 
   
     while (1) {
-        // Escuta os botões
+
         readButtons();
         /**
          * \brief Inicia o jogo se o botão de iniciar for pressionado e o estado for START
@@ -168,10 +185,10 @@ void* movimentoToupeira(void* arg) {
          * a função limpa o bloco de fundo, desenha a tela do jogo e define o estado para RUNNING.
          * O tempo de início e o último tempo de verificação são registrados.
          */
-        if (button0 && state == START) { // inicia se ainda nao tiver iniciado
+        if (button0 && state == START) {
             clear_background_block();
             draw_game_screen();
-            state = RUNNING; // rodando
+            state = RUNNING;
             start_time = time(NULL);
             last_check_time = time(NULL);
         }
@@ -182,11 +199,10 @@ void* movimentoToupeira(void* arg) {
          * Quando o botão de pausar (button1) é pressionado e o estado atual é RUNNING, 
          * a função define o estado para PAUSED, desenha os blocos de pausa e registra o tempo de pausa.
          */
-        if (button1 && state == RUNNING) { // so pausa se tiver rodando
-            state = PAUSED; //pausado
+        if (button1 && state == RUNNING) {
+            state = PAUSED;
             draw_pause_blocks();
             pause_time = time(NULL);
-            //lastdif = time(NULL) - last_check_time; 
         }
 
         while (button1) {
@@ -201,7 +217,7 @@ void* movimentoToupeira(void* arg) {
          * Quando o botão de pausar (button1) é pressionado novamente e o estado atual é PAUSED, 
          * a função define o estado para RUNNING, remove os blocos de pausa e ajusta o tempo total de pausa.
          */
-        if (button1 && state == PAUSED) { // retorna da pausa se tiver pausado
+        if (button1 && state == PAUSED) {
             state = RUNNING;
             remove_pause_blocks();
             total_pause_time += time(NULL) - pause_time;
@@ -214,14 +230,14 @@ void* movimentoToupeira(void* arg) {
          * define o estado para RUNNING, reinicia a pontuação, o tempo total de pausa, o tempo de início e o 
          * último tempo de verificação. Em seguida, redesenha a tela do jogo.
          */
-        if (button2) { // restart
+        if (button2) {
             base_block_address = 315;
             state = RUNNING;
-            pontuacao = 0; // reinicia pontuação
+            pontuacao = 0;
             total_pause_time = 0;
-            start_time = time(NULL); // reinicia o tempo
+            start_time = time(NULL);
             last_check_time = start_time;
-            draw_game_screen(); // redesenha a tela do game
+            draw_game_screen();
         }
 
         /**
@@ -230,8 +246,8 @@ void* movimentoToupeira(void* arg) {
          * Quando o botão de parar (button3) é pressionado em qualquer estado, 
          * a função define o estado para ENDED_BY_BUTTON, limpa os sprites e o bloco de fundo, e sai do loop.
          */
-        if (button3) { // encerra em qualquer state
-            state = ENDED_BY_BUTTON; //encerrado
+        if (button3) {
+            state = ENDED_BY_BUTTON;
             clear_sprite();
             clear_background_block();
             break;
@@ -245,41 +261,38 @@ void* movimentoToupeira(void* arg) {
             for (i = 0; i < 9; i++) {
                 if (toupeiras[i]->moving) {
                     // Movimenta a toupeira
-                    toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
-                    toupeiras[i]->interval = rand() % 3 + 1; // entre 1 e 3 seg
+                    toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; /* Coordenada diminui para cima */
+                    toupeiras[i]->interval = rand() % 3 + 1; /* Entre 1 e 3 segundos */
 
-                    // Verifica se chegou ao limite e inverte a direção
-                    // Ta em cima e desce
+
                     if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
-                        toupeiras[i]->direction = -1;
-                    // Ta embaixo e para
+                        toupeiras[i]->direction = -1;   /* Troca de direção ao chegar no valor máximo */
                     } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
                         toupeiras[i]->direction = 1;
                         toupeiras[i]->moving = 0;
-                        toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
+                        toupeiras[i]->last_update = current_time; /* Atualiza o tempo da última parada */
                     }
                     set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
                     set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
-                    // Atualiza o sprite
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
-                    // Define um novo intervalo aleatório
-                    toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
+                    toupeiras[i]->moving = 1; /* Retoma o movimento da toupeira */
                    
                 }
                 readButtons();
             }
 
+            /* Movimenta mais rápido quando a pontuação é maior que 25 */
             if (pontuacao < 25) {
-                usleep(400000); // 250ms
+                usleep(400000); // 400 ms
             } else if (pontuacao < 50) {
-                usleep(300000); // 150 ms
-            } // mov mais rapido com maior pontuação
+                usleep(300000); // 300 ms
+            }
 
             if ((current_time - last_check_time) >= 5) {
                 set_background_block(base_block_address, 1, 4, 6);
                 base_block_address -= 1;
-                last_check_time = time(NULL); // Atualiza o tempo da última verificação
-            } // cada 5 seg
+                last_check_time = time(NULL); /* Atualiza o tempo da última verificação (a cada 5 segundos) */
+            }
 
             if ((current_time - start_time - total_pause_time) >= 60) {
                 state = ENDED_BY_TIME;
@@ -308,8 +321,8 @@ void* mouse(void* arg) {
     signed char x_disp, y_disp;
     char mouse_buffer[3];
 
-    fd = open(MOUSEFILE, O_RDONLY); // Abre arquivo do mouse
-    if (fd == -1) { // Se o arquivo do mouse retornar -1 significa que deu erro
+    fd = open(MOUSEFILE, O_RDONLY); // Abre dispositivo do mouse
+    if (fd == -1) {
         perror("Não é possível abrir o dispositivo do mouse");
         exit(EXIT_FAILURE);
     }
@@ -336,6 +349,7 @@ void* mouse(void* arg) {
             change_coordinate(martelo, x, y);
 
 
+            // Verifica condições para pontuar
             int i;
             for (i = 0; i < 9; i++) {
                  if (collision(toupeiras[i], martelo) && leftButton && toupeiras[i]->coord_y <= toupeiras[i]->max_y && state == RUNNING) {
@@ -343,7 +357,6 @@ void* mouse(void* arg) {
 
                 }
             }
-
 
             /* ======= DISPLAY ======== */
             /* Formatação da pontuação pra o display 7 */
@@ -394,16 +407,6 @@ void write_sprites() {
 }
 
 
-void draw_initial_screen() {
-    int i;
-    for (i = 0; i < 4800; i++) {
-        int R = initialScreen[i][0];
-        int G = initialScreen[i][1];
-        int B = initialScreen[i][2];
-        set_background_block(i, R, G, B);
-    }
-}
-
 int main() {
     
     pthread_t thread1, thread2;
@@ -414,7 +417,7 @@ int main() {
 
     write_sprites();
 
-    /* Apaga  mostrador de 7 segmentos */
+    /* Apaga mostrador de 7 segmentos */
     *HEX3_ptr = 0b1111111;
     *HEX4_ptr = 0b1111111;
     *HEX5_ptr = 0b1111111;
@@ -423,7 +426,7 @@ int main() {
 
 /* ============ CRIAÇÃO DE SPRITES ============= */
 
-// primeira linha
+    /* Toupeiras - linha 1*/
     Sprite toupeira1;
     toupeira1.coord_x = 200;
     toupeira1.coord_y = 300;
@@ -457,7 +460,7 @@ int main() {
     toupeira3.min_y = 300;
     toupeira3.max_y = 285;
 
-// segunda linha
+    /* Toupeiras - linha 2 */
     Sprite toupeira4;
     toupeira4.coord_x = 200;
     toupeira4.coord_y = 350;
@@ -544,6 +547,7 @@ int main() {
     martelo.ativo = 1;
     martelo.data_register = 1;
 
+
     /* Arbustos - linha 1 */
     Sprite_Fixed arbusto1;
     arbusto1.coord_x = 200;
@@ -567,7 +571,7 @@ int main() {
     arbusto3.data_register = 4; 
 
 
-// linha 2
+    /* Arbustos - linha 2 */
     Sprite_Fixed arbusto4;
     arbusto4.coord_x = 200;
     arbusto4.coord_y = 350;
@@ -589,7 +593,7 @@ int main() {
     arbusto6.ativo = 1;
     arbusto6.data_register = 7; 
 
-//linha 3
+    /* Arbustos - linha 3 */
     Sprite_Fixed arbusto7;
     arbusto7.coord_x = 200;
     arbusto7.coord_y = 400;
@@ -644,11 +648,6 @@ int main() {
         perror("Failed to join thread 2");
         return 1;
     }
-    //if (pthread_create(&thread1, NULL, movimentoToupeira, (void*)&toupeira) != 0) {
-    // if (pthread_join(thread3, NULL) != 0) {
-    //     perror("Failed to join thread 3");
-    //     return 1;
-    // }
 
     return 0;
 }
