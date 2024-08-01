@@ -400,7 +400,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 ## Resultado Final
 O GIF demonstra a versão do jogo "Whack-a-Mole", onde o cursor do mouse atua como um martelo para acertar as toupeiras que aparecem aleatoriamente nos arbustos.
 <p align="center">
-    <img src="imagens/jogo.jpg" alt="Execução do jogo" width="300">
+    <img src="gifs/jogo.jpg" alt="Execução do jogo" width="300">
     <br>
     GIF. Jogabilidade
 </p>
