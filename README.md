@@ -196,7 +196,7 @@ Para o processamento das imagens, foi utilizada a biblioteca <a href="https://py
 </p>
 
 <p align="center">
-    <img src="imagens/colisao.png"width="200">
+    <img src="imagens/colisao.png"width="500">
     <br>
    Figura X. Exemplo de colisão de quadrados na terceira figura
     
