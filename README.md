@@ -545,12 +545,13 @@ Em conclusão, o projeto demonstrou que a comunicação entre o HPS e o Processa
 
 <b>COLLISION DETECTION. Learn OpenGL, 2024<b>. Disponível em: <https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection>. 
 
+<b>PTHREADS. Carnegie Mellon University, 2007<b>. Disponível em: <https://www.cs.cmu.edu/afs/cs/academic/class/15492-f07/www/pthreads.html>. 
+
 <b>Character device drivers — The Linux Kernel documentation</b>. Disponível em: <https://linux-kernel-labs.github.io/refs/heads/master/labs/device_drivers.html>.
 
 <b>Memory mapping — The Linux Kernel documentation</b>. Disponível em: <https://linux-kernel-labs.github.io/refs/heads/master/labs/memory_mapping.html>.
 
 <b>Technologies, Terasic. DE1-SoC User Manual</b>. Disponível em: <http://www.ee.ic.ac.uk/pcheung/teaching/ee2_digital/de1-soc_user_manual.pdf.>
-
 
 SÁ BARRETO, Gabriel. <b>Desenvolvimento de uma Arquitetura Baseada em Sprites para criação de Jogos 2D em Ambientes Reconfiguráveis utilizando dispositivos FPGA</b>. s.d. 14 f. Trabalho de Conclusão de Curso (Graduação em Engenharia de Computação) Universidade Estadual de Feira de Santana, Bahia.
 
