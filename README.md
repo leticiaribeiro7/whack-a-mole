@@ -38,7 +38,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Padrão VGA](#padrão-vga)
     - [Mouse](#mouse)
     - [Processador Gráfico](#processador-gráfico)
-    - [Módulo de Kernel]
+    - [Módulo de Kernel](#modulo-de-kernel)
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
     - [Sprites Novos e Telas do Jogo](#sprites-novos-e-telas-do-jogo)
@@ -131,7 +131,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 
 ### Processador Gráfico
 <p align="justify"> 
-    O Processador Gráfico é responsável pela renderização e execução de um conjunto de instruções que permitem mover e controlar <i>sprites</i>, modificar a configuração do <i>background</i> da tela e renderizar polígonos, como quadrados e triângulos. As saídas do Processador Gráfico incluem os sinais de sicronização horizontal <i>(h_sync)</i> e vertical <i>(v_sync)</i> do monitor VGA, além dos bits de cores RGB <i>(Red, Green, Blue)</i>. A Figura 4 ilustra a arquitetura completa do processador gráfico, conforme detalhado no TCC.
+    O Processador Gráfico está embarcado na FPGA da placa e é responsável pela renderização e execução de um conjunto de instruções que permitem mover e controlar <i>sprites</i>, modificar a configuração do <i>background</i> da tela e renderizar polígonos, como quadrados e triângulos. As saídas do Processador Gráfico incluem os sinais de sicronização horizontal <i>(h_sync)</i> e vertical <i>(v_sync)</i> do monitor VGA, além dos bits de cores RGB <i>(Red, Green, Blue)</i>. A Figura 4 ilustra a arquitetura completa do processador gráfico, conforme detalhado no TCC.
 </p>
 <p align="center">
     <img src="imagens/arquitetura_processador.png" alt="VGA" width="500">
@@ -140,6 +140,34 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 </p>
 
 ### Módulo de Kernel
+
+<p align="justify"> 
+Sabendo que a comunicação com hardware requer tipos de dados específicos a fim de evitar resultados inesperados, algumas mudanças foram efetuadas no módulo de kernel:
+</p>
+
+**Alteração do tipo de ponteiro LW_Virtual para __iomem**
+<p align="justify"> 
+Este ponteiro é o Lightweight HPS-to-FPGA, que funciona como uma ponte para acesso aos componentes da FPGA e é usado no mapeamento de memória física para virtual.
+</p>
+
+Exemplo de uso:
+```
+data_a_ptr = (volatile int*)(LW_virtual + DATA_A_BASE); // Acesso ao barramento Data A do processador gráfico
+```
+
+Como os componentes são de I/O, o tipo **___iomem_** é mais adequado, pois se trata de um tipo que referencia uma região de memória de entrada/saída.
+
+
+**Alteração do tipo dos ponteiros dos barramentos DataA e DataB para u32**
+
+<p align="justify"> 
+Os barramentos tem 32 bits cada, e o uso do tipo u32 (unsigned int 32 bits) é adequado, para que os dados enviados para os barramentos tenham o tamanho exato.
+</p>
+
+**Uso da função _iowrite32_**
+
+É comumente usada no desenvolvimento de drivers no kernel do Linux para escrever um valor de 32 bits em um endereço de memória de I/O mapeada, garantindo que a comunicação seja eficiente e correta.
+
 
 
 ## Threads
