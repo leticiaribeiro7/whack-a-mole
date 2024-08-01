@@ -50,7 +50,6 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Regras e Jogabilidade](#regras-e-jogabilidade)
 - [Fluxograma da Solução Geral do Projeto](#fluxograma-da-solução-geral-do-projeto)
 - [Cenários de Testes](#cenários-de-testes)
-- [Resultado Final](#resultado-final)
 - [Conclusão](#conclusão)
 - [Referências](#referências)
 
