@@ -1,4 +1,9 @@
 <h1 align="center"> Whack a Mole - Jogo 2D</h1>
+<p align="center">
+    <img src="imagens/titulo.png" alt="Placa DE1-SoC" width="500">
+    <br>
+   
+</p>
 
 ## Sobre
 
