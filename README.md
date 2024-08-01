@@ -192,7 +192,7 @@ Para o processamento das imagens, foi utilizada a biblioteca <a href="https://py
     A colisão é um princípio básico nos jogos, neste contexto foi necessário saber quando o martelo colide com a toupeira. Para implementar isso, foi usado um conceito chamado Axis-Aligned Bounding Box (Caixa Delimitadora Alinhada aos Eixos), uma forma de colisão retangular alinhada aos eixos base da cena, que em 2D se alinha aos eixos x e y. Estar alinhada aos eixos significa que a caixa retangular não possui rotação e suas bordas são paralelas aos eixos base da cena (por exemplo, as bordas esquerda e direita são paralelas ao eixo y). O fato dessas caixas estarem sempre alinhadas aos eixos da cena facilita os cálculos.
 </p>
 <p align="justify">
-    Uma colisão ocorre quando dois elementos entram nas regiões um do outro, por exemplo, é determinado se o primeiro objeto está de alguma forma dentro do espaço do segundo objeto (nesse caso, ambos os objetos tem tamanho 20x20). Então, verificamos se as bordas horizontais e as bordas verticais dos dois objetos se sobrepõem, se sim, ocorreu uma colisão.
+    Uma colisão ocorre quando dois elementos entram nas regiões um do outro, é determinado se o primeiro objeto está de alguma forma dentro do espaço do segundo objeto (nesse caso, ambos os objetos tem tamanho 20x20). Então, verificamos se as bordas horizontais e as bordas verticais dos dois objetos se sobrepõem, se sim, ocorreu uma colisão.
 </p>
 
 <p align="center">
