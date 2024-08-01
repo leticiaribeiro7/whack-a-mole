@@ -38,13 +38,13 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
     - [Sprites Novos](#sprites-novos)
-    - Colisão 
+    - [Colisão](#colisão)
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
     - [Display 7 Segmentos](#display-7-segmentos)
     - [Temporizador](#temporizador)
     - [Regras e Jogabilidade](#regras-e-jogabilidade)
-- [Solução Geral]
+- [Fluxograma da Solução Geral do Projeto](#fluxograma-da-solução-geral-do-projeto)
 - [Cenários de Testes](#cenários-de-testes)
 - [Conclusão](#conclusão)
 - [Referências](#referências)
@@ -95,7 +95,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 </p>
 
 <p align="center">
-    <img src="Imagens/monitor.jpg" width="300">
+    <img src="imagens/monitor.jpg" width="300">
     <br>
     Figura 2. Monitor Tubo CRT
 </p>
@@ -109,7 +109,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
     A sicronização VGA envolve pulsos de sicronização horizontal (<i>hsync</i>) e vertical (<i>vsync</i>), com períodos específicos denominados <i>back porch</i>, <i>front porch</i> e intervalo de exibição para controlar os dados RGB. Após o pulso <i>hsync</i>, os sinais RGB são desligados (<i>back porch</i>), seguidos pelo intervalo de exibição onde os dados RGB ativam cada <i>pixel</i>, e depois desligados novamente (<i>front porch</i>) antes do próximo pulso <i>hsync</i>.
 </p>
 <p align="center">
-    <img src="Imagens/vga.png" alt="VGA" width="600">
+    <img src="imagens/vga.png" alt="VGA" width="600">
     <br>
     Figura 3. Conexões entre o FPGA e o VGA
 </p>
