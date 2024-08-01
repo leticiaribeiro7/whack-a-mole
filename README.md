@@ -1,6 +1,5 @@
 <h1 align="center"> Whack a Mole - Jogo 2D</h1>
 
-
 ## Sobre
 
 <p align="justify"> 
@@ -36,14 +35,16 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Processador Gráfico]
     - [Módulo de Kernel]
 
-- [Uso de Threads]
+- [Threads](#threads)
 
-- [Implementação do Jogo]
+- [Implementação do Jogo](#implementação-do-jogo)
     - Srites novas
     - Colisão 
-    - Movimentações (mouse e toupeiras)
-    - Pontuação e Temporizador
-    - Botões e Display
+    - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
+    - [Uso dos Botões](#uso-dos-botões)
+    - [Display 7 Segmentos](#display-7-segmentos)
+    - [Temporizador](#temporizador)
+    - [Regras e Jogabilidade](#regras-e-jogabilidade)
 
 - [Solução Geral]
 - [Cenários de Testes](#cenários-de-testes)
@@ -216,6 +217,28 @@ Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi 
     <br>
 <p>
 
+### Display 7 Segmentos
+<p align="justify">
+A pontuação do jogo é mostrada no display de 7 segmentos, dos 6 dígitos disponíveis foram usados 3 para contar até a casa das centenas, devido ao tempo do jogo ser limitado. Foi usado um ponteiro para cada dígito do display, portanto a pontuação precisou ser isolada em dígitos separados, essa lógica foi implementada utilizando divisões e resto de divisões:
+
+<p align="center">
+    <img src="imagens/display7.png"width="300">
+    <br>
+<p>
+
+Para mostrar dígitos decimais e acender os segmentos certos foi utilizado um array para mapear o correspondente binário dos números de 0 a 9.
+</p>
+
+### Temporizador
+<p align="justify">
+A duração de uma partida do jogo é 60 segundos e a cada 5 segundos uma parte da barra de tempo desaparece, para que isso seja possível é preciso contar o tempo de execução do programa. Para isso, foi utilizada a biblioteca time.h e a função time(); ao salvar o valor de retorno dessa função em diferentes partes do código e depois subtrair, é possível obter o tempo que se passou em segundos entre uma e outra, essa foi a abordagem utilizada.
+
+```current_time - start_time >= 60```
+
+</p>
+
+### Regras e Jogabilidade
+--
 
 
 
