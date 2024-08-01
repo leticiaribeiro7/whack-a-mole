@@ -36,7 +36,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Módulo de Kernel]
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - [Sprites Novos](#sprites-novos)
+    - [Sprites Novos e Telas do Jogo](#sprites-novos-e-telas-do-jogo)
     - [Colisão](#colisão)
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
@@ -156,7 +156,7 @@ Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, 
 
 ## Implementação do Jogo
 
-### Sprites Novos
+### Sprites Novos e Telas do Jogo
 <p align="justify">
 Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Foi utilizada a ferramenta <a href="https://www.pixilart.com">Pixilart</a> para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após o desenho ser finalizado, as imagens foram salvas no formato adequado.
 
@@ -184,6 +184,10 @@ Para o processamento das imagens, foi utilizada a biblioteca <a href="https://py
     <img src="sprites/toupeira.png"width="60">
     <br>
    Figura X. Sprite de toupeira
+</p>
+
+<p align="justify">
+As telas do jogo (vide [Cenários de Teste]) também foram feitas com a mesma abordagem dos sprites, porém os desenhos foram feitos em tamanho 80x60, dado que o monitor com VGA possui 640x480 pixels e cada bloco personalizável do processador gráfico tem tamanho 8x8. O código em Python está preparado para receber qualquer tamanho de imagem, basta passar por parâmetro a largura e a altura desejada.
 </p>
 
 ### Colisão
