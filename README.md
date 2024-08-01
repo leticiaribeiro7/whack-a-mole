@@ -63,7 +63,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 ### Kit de desenvolvimento DE1-SoC
 
 <p align="justify">
-    A placa de desenvolvimento DE1-SoC é uma plataforma baseada no chip Altera Cyclone V SoC, que integra um processador ARM Cortex-A9 dual-core com uma FPGA da família Cyclone V. A DE1-SoC possui uma ampla variedade de periféricos e interfaces. Os periféricos utilizados nesse projeto foram como está numerado na imagem:
+    A placa de desenvolvimento DE1-SoC é uma plataforma baseada no chip Altera Cyclone V SoC, que integra um processador ARM Cortex-A9 dual-core com uma FPGA da família Cyclone V. A DE1-SoC possui uma ampla variedade de periféricos e interfaces. Os periféricos utilizados nesse projeto foram os que estão numerados na imagem:
 </p>
 
 <p align="center">
