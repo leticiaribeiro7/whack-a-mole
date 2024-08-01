@@ -4,12 +4,19 @@
 ## Sobre
 
 <p align="justify"> 
+O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no [projeto de comunicação com o processador gráfico](https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre). 
+<p>
+
+<p align="justify">
+O jogo foi projetado para permitir a interação do usuário exclusivamente através do mouse, que serve como um dos principais meios de controle. Para permitir o controle das diversas funcionalidades do jogo como iniciar, pausar, retornar e encerrar, foi necessário mapear e programar os botões da placa DE1-SoC. Além disso, foi implementado o uso de displays de 7 segmentos para fornecer informações ao usuário.
 </p>
 
 <p align="justify"> 
+A plataforma DE1-SoC combina um processador ARM (HPS) com um processador gráfico integrado na FPGA, possibilitando uma comunicação eficiente entre esses dois componentes. Essa integração permite o controle e a manipulação visual através de um monitor VGA com resolução de 640×480 pixels.
 </p>
 
 <p align="justify"> 
+Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da biblioteca em linguagem C para estabelecer uma ponte de comunicação mais eficiente entre o processador gráfico na FPGA e o programa a nível de usuário, para que fosse possível realizar com êxito a construção do projeto atual.
 </p>
 
 
