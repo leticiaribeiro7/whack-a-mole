@@ -161,13 +161,7 @@ void* movimentoToupeira(void* arg) {
     while (1) {
         // Escuta os botões
         readButtons();
-        /**
-         * \brief Inicia o jogo se o botão de iniciar for pressionado e o estado for START
-         * 
-         * Quando o botão de iniciar (button0) é pressionado e o estado atual é START, 
-         * a função limpa o bloco de fundo, desenha a tela do jogo e define o estado para RUNNING.
-         * O tempo de início e o último tempo de verificação são registrados.
-         */
+       
         if (button0 && state == START) { // inicia se ainda nao tiver iniciado
             clear_background_block();
             draw_game_screen();
@@ -176,12 +170,7 @@ void* movimentoToupeira(void* arg) {
             last_check_time = time(NULL);
         }
 
-        /**
-         * \brief Pausa o jogo se o botão de pausar for pressionado e o estado for RUNNING
-         * 
-         * Quando o botão de pausar (button1) é pressionado e o estado atual é RUNNING, 
-         * a função define o estado para PAUSED, desenha os blocos de pausa e registra o tempo de pausa.
-         */
+        
         if (button1 && state == RUNNING) { // so pausa se tiver rodando
             state = PAUSED; //pausado
             draw_pause_blocks();
@@ -195,25 +184,13 @@ void* movimentoToupeira(void* arg) {
 
         readButtons();
 
-        /**
-         * \brief Retorna do estado de pausa se o botão de pausar for pressionado novamente e o estado for PAUSED
-         * 
-         * Quando o botão de pausar (button1) é pressionado novamente e o estado atual é PAUSED, 
-         * a função define o estado para RUNNING, remove os blocos de pausa e ajusta o tempo total de pausa.
-         */
+        
         if (button1 && state == PAUSED) { // retorna da pausa se tiver pausado
             state = RUNNING;
             remove_pause_blocks();
             total_pause_time += time(NULL) - pause_time;
         }
 
-        /**
-         * \brief Reinicia o jogo se o botão de reiniciar for pressionado
-         * 
-         * Quando o botão de reiniciar (button2) é pressionado, a função redefine o endereço do bloco base, 
-         * define o estado para RUNNING, reinicia a pontuação, o tempo total de pausa, o tempo de início e o 
-         * último tempo de verificação. Em seguida, redesenha a tela do jogo.
-         */
         if (button2) { // restart
             base_block_address = 315;
             state = RUNNING;
@@ -224,12 +201,7 @@ void* movimentoToupeira(void* arg) {
             draw_game_screen(); // redesenha a tela do game
         }
 
-        /**
-         * \brief Encerra o jogo se o botão de parar for pressionado
-         * 
-         * Quando o botão de parar (button3) é pressionado em qualquer estado, 
-         * a função define o estado para ENDED_BY_BUTTON, limpa os sprites e o bloco de fundo, e sai do loop.
-         */
+        
         if (button3) { // encerra em qualquer state
             state = ENDED_BY_BUTTON; //encerrado
             clear_sprite();
@@ -242,45 +214,59 @@ void* movimentoToupeira(void* arg) {
 
             int current_time = time(NULL);
             int i;
+
+            /**
+             * \brief Laço para controlar o movimento das toupeiras
+             * 
+             * Este laço percorre todas as toupeiras, verificando se elas estão em movimento. 
+             * Se estiverem, a função atualiza a posição da toupeira e verifica se ela chegou ao 
+             * limite, invertendo a direção ou parando o movimento conforme necessário.
+             * Se a toupeira não estiver em movimento, verifica se é hora de retomar o movimento 
+             * com base no intervalo definido.
+             */
             for (i = 0; i < 9; i++) {
                 if (toupeiras[i]->moving) {
-                    // Movimenta a toupeira
-                    toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; // pra cima diminui
-                    toupeiras[i]->interval = rand() % 3 + 1; // entre 1 e 3 seg
+                    /* Movimenta a toupeira*/
+                    toupeiras[i]->coord_y -= toupeiras[i]->direction * 5; /*pra cima diminui*/
+                    toupeiras[i]->interval = rand() % 3 + 1; /*entre 1 e 3 seg*/
 
-                    // Verifica se chegou ao limite e inverte a direção
-                    // Ta em cima e desce
+                    /*Verifica se chegou ao limite e inverte a direção*/
+                    /*Ta em cima e desce*/
                     if (toupeiras[i]->coord_y <= toupeiras[i]->max_y) {
                         toupeiras[i]->direction = -1;
-                    // Ta embaixo e para
+                    /*Ta embaixo e para*/
                     } else if (toupeiras[i]->coord_y >= toupeiras[i]->min_y) {
                         toupeiras[i]->direction = 1;
                         toupeiras[i]->moving = 0;
-                        toupeiras[i]->last_update = current_time; // Atualiza o tempo da última parada
+                        toupeiras[i]->last_update = current_time; /*Atualiza o tempo da última parada*/
                     }
                     set_sprite(arbustos[i]->data_register, arbustos[i]->coord_x, arbustos[i]->coord_y, arbustos[i]->offset, arbustos[i]->ativo);
                     set_sprite(toupeiras[i]->data_register, toupeiras[i]->coord_x, toupeiras[i]->coord_y, toupeiras[i]->offset, toupeiras[i]->ativo);
-                    // Atualiza o sprite
+                    /*Atualiza o sprite*/
                 } else if (current_time - toupeiras[i]->last_update >= toupeiras[i]->interval) {
-                    // Define um novo intervalo aleatório
-                    toupeiras[i]->moving = 1; // Retoma o movimento da toupeira
+                    /*Define um novo intervalo aleatório*/
+                    toupeiras[i]->moving = 1; /*Retoma o movimento da toupeira*/
                    
                 }
                 readButtons();
             }
 
+        
             if (pontuacao < 25) {
-                usleep(400000); // 250ms
+                usleep(400000); /*250ms*/
             } else if (pontuacao < 50) {
-                usleep(300000); // 150 ms
-            } // mov mais rapido com maior pontuação
+                usleep(300000); /*150 ms*/
+            } /*mov mais rapido com maior pontuação*/
 
+
+        
             if ((current_time - last_check_time) >= 5) {
                 set_background_block(base_block_address, 1, 4, 6);
                 base_block_address -= 1;
-                last_check_time = time(NULL); // Atualiza o tempo da última verificação
-            } // cada 5 seg
+                last_check_time = time(NULL); /*Atualiza o tempo da última verificação*/
+            } /*cada 5 seg*/
 
+          
             if ((current_time - start_time - total_pause_time) >= 60) {
                 state = ENDED_BY_TIME;
                 clear_sprite();
