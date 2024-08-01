@@ -226,12 +226,26 @@ Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi 
 <p align="justify">
 A pontuação do jogo é mostrada no display de 7 segmentos, dos 6 dígitos disponíveis foram usados 3 para contar até a casa das centenas, devido ao tempo do jogo ser limitado. Foi usado um ponteiro para cada dígito do display, portanto a pontuação precisou ser isolada em dígitos separados, essa lógica foi implementada utilizando divisões e resto de divisões:
 
-<p align="center">
-    <img src="imagens/display7.png"width="300">
-    <br>
-<p>
+```c
+    int dezena = pontuacao / 10;
+    int unidade = pontuacao % 10;
+    int centena = (pontuacao / 100) % 10;
+```
 
-Para mostrar dígitos decimais e acender os segmentos certos foi utilizado um array para mapear o correspondente binário dos números de 0 a 9.
+
+Para mostrar dígitos decimais e acender os segmentos certos, foi utilizado um array para mapear o correspondente binário dos números de 0 a 9 e uma função para pegar esses valores do array e passar para o ponteiro:
+
+```c
+    uint8_t display(int number) {
+        return segmentos[number];
+    }
+
+    *HEX0_ptr = display(unidade);
+    *HEX1_ptr = display(dezena);
+    *HEX2_ptr = display(centena);
+
+```
+
 </p>
 
 ### Temporizador
