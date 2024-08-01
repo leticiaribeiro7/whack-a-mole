@@ -213,7 +213,7 @@ Além dessa técnica, foi empregado também o uso de máscaras de bits para cada
 Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi implementada uma máquina de estados. As transições, estados e entradas necessárias para que aconteçam estão detalhadas no diagrama a seguir:
 </p>
 <p align="center">
-    <img src="imagens/state-machine.png"width="300">
+    <img src="imagens/state-machine1.png"width="300">
     <br>
 <p>
 
