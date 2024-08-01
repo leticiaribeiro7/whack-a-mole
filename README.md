@@ -38,7 +38,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 - [Implementação do Jogo](#implementação-do-jogo)
     - [Sprites Novos e Telas do Jogo](#sprites-novos-e-telas-do-jogo)
     - [Colisão](#colisão)
-    - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
+    - [Movimentações)](#movimentações)
     - [Uso dos Botões](#uso-dos-botões)
     - [Display 7 Segmentos](#display-7-segmentos)
     - [Temporizador](#temporizador)
@@ -138,10 +138,18 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 
 
 ## Threads
+#### Contextualização 
+<p align="justify">
+Threads são unidades básicas de execução que um processo pode dividir para realizar múltiplas tarefas simultaneamente. Eles permitem a execução concorrente dentro de um único processo. 
+Uma vantagem de usá-las é aumentar a eficiência do programa, especialmente em operações de I/O ou em processadores multicore. Por outro lado, podem ocorrer resultados inesperados devido à condições de corrida: 
+quando duas threads ou mais acessam e modificam dados compartilhados simultaneamente.
+</p>
 
+#### Aplicação
 <p align="justify">
 Para que o jogo funcione de forma satisfatória, é necessário que múltiplos movimentos ocorram independentemente na tela, ou seja, as toupeiras e o martelo devem se mover ao mesmo tempo. Devido a este requisito, duas threads foram implementadas, cada uma responsável pelo movimento de um tipo de elemento do jogo.
 <p>
+
 
 <p align="justify">
 As toupeiras são elementos passivos, que significa que não precisam de ação do jogador para se movimentar, enquanto o martelo é um elemento ativo que é controlado pelo jogador. Portanto, a lógica de movimento das toupeiras está em uma thread e a do martelo está em outra.
@@ -216,7 +224,7 @@ As telas do jogo (vide seção <a href="https://github.com/leticiaribeiro7/whack
     
 </p>
 
-### Movimentações (Mouse e Toupeiras)
+### Movimentações
 
 **Movimentação do Mouse**
 <p align="justify">
