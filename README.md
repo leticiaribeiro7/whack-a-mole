@@ -482,7 +482,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Ao pressionar o botão KEY0 na placa, a tela inicial deve ser substituída pela tela do jogo.
 
 <p align="center">
-    <img src="imagens/tela_jogo.jpg" alt="Tela do jogo" width="500">
+    <img src="gifs/jogo.gif" alt="Tela do jogo" width="500">
     <br>
     Figura X. Tela do jogo
 </p>
@@ -504,7 +504,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Quando o tempo de 60 segundos se esgota durante o jogo, a tela do jogo é substituída pela tela de game over.
 
 <p align="center">
-    <img src="imagens/game_over.jpg" alt="Tela de game over" width="400">
+    <img src="gifs/game-over.gif" alt="Tela de game over" width="400">
     <br>
     Figura X. Tela de game over
 </p>
@@ -512,19 +512,11 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Ao clicar com o botão esquerdo do mouse nas toupeiras que aparecem durante o jogo, os pontos são atualizados no display de 7 segmentos.
 
 <p align="center">
-    <img src="imagens/pontuacao.jpg" alt="Pontuação no display 7 segmentos" width="300">
+    <img src="gifs/display7.gif" alt="Pontuação no display 7 segmentos" width="300">
     <br>
     Figura X. Pontuação no display 7 segmentos
 </p>
 
-
-## Resultado Final
-O GIF demonstra a versão do jogo "Whack-a-Mole", onde o cursor do mouse atua como um martelo para acertar as toupeiras que aparecem aleatoriamente nos arbustos.
-<p align="center">
-    <img src="gifs/jogo.mp4" alt="Execução do jogo" width="300">
-    <br>
-    GIF. Jogabilidade
-</p>
 
 ## Conclusão
 <p align="justify">
