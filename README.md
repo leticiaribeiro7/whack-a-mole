@@ -3,7 +3,7 @@
 ## Sobre
 
 <p align="justify"> 
-O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no <a href=“https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#“>projeto de comunicação com o processador gráfico</a>. 
+O objetivo central deste projeto foi desenvolver um jogo para a arquitetura criada anteriormente no [projeto de comunicação com o processador gráfico](https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre). 
 <p>
 
 <p align="justify">
@@ -35,23 +35,16 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Processador Gráfico]
     - [Módulo de Kernel]
 
-
-- [Uso de Threads]
-    - Thread1 - Movimento do Martelo
-    - Thread2 - Movimento das Toupeiras
-
-
-
+- [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - Srites novas
-    - Colisão 
+    - [Sprites Novos](#sprites-novos)
+    - [Colisão](#colisão)
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
     - [Display 7 Segmentos](#display-7-segmentos)
     - [Temporizador](#temporizador)
     - [Regras e Jogabilidade](#regras-e-jogabilidade)
-
-- [Solução Geral]
+- [Fluxograma da Solução Geral do Projeto](#fluxograma-da-solução-geral-do-projeto)
 - [Cenários de Testes](#cenários-de-testes)
 - [Conclusão](#conclusão)
 - [Referências](#referências)
@@ -102,7 +95,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 </p>
 
 <p align="center">
-    <img src="Imagens/monitor.jpg" width="300">
+    <img src="imagens/monitor.jpg" width="300">
     <br>
     Figura 2. Monitor Tubo CRT
 </p>
@@ -116,7 +109,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
     A sicronização VGA envolve pulsos de sicronização horizontal (<i>hsync</i>) e vertical (<i>vsync</i>), com períodos específicos denominados <i>back porch</i>, <i>front porch</i> e intervalo de exibição para controlar os dados RGB. Após o pulso <i>hsync</i>, os sinais RGB são desligados (<i>back porch</i>), seguidos pelo intervalo de exibição onde os dados RGB ativam cada <i>pixel</i>, e depois desligados novamente (<i>front porch</i>) antes do próximo pulso <i>hsync</i>.
 </p>
 <p align="center">
-    <img src="Imagens/vga.png" alt="VGA" width="600">
+    <img src="imagens/vga.png" alt="VGA" width="600">
     <br>
     Figura 3. Conexões entre o FPGA e o VGA
 </p>
@@ -148,22 +141,50 @@ As toupeiras são elementos passivos, que significa que não precisam de ação 
 Para implementar essa funcionalidade, foram utilizadas as funções pthread_create e pthread_join da biblioteca pthread. A função pthread_create é responsável por criar uma nova thread, enquanto pthread_join aguarda a conclusão da thread.
 <p>
 
-<p align="justify">
 
 **Thread1 - Movimento do Martelo**
 
+<p align="justify">
 O movimento do martelo, controlado pelo jogador, é gerenciado pela thread1. Esta thread é responsável por detectar os movimentos do mouse e atualizar a posição do martelo na tela em tempo real. Além disso, para garantir que o martelo permaneça dentro dos limites da tela, foi implementada uma limitação do cursor para evitar que o jogador movimente o martelo para uma coordenada inválida.
 A contagem de pontuação também está integrada nesta thread. Cada vez que o jogador acerta uma toupeira com o martelo, a pontuação é atualizada.
 <p>
-<p align="justify">
 
 **Thread2 - Movimento das Toupeiras**
-
+<p align="justify">
 As toupeiras se movem de forma independente do jogador e são gerenciadas pela thread2. Esta thread controla o aparecimento e o desaparecimento das toupeiras de maneira aleatória.
 Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, um temporizador é utilizado nesta thread. Esse temporizador define o intervalo de tempo em que cada toupeira permanece visível antes de desaparecer e reaparecer em outro lugar. A detecção dos botões da placa também faz parte desta thread.
 </p>
 
 ## Implementação do Jogo
+
+### Sprites Novos
+<p align="justify">
+Para compor o jogo, foram criados três sprites na memória de sprites: martelo, arbusto e toupeira. Na criação dos sprites, foi utilizada a ferramenta Pixilart com a dimensão de 20x20 pixels. O desenho foi realizado pixel a pixel, a imagem foi salva e uma matriz R, G e B foi gerada em Python, que posteriormente foi convertida para a linguagem C.
+</p>
+
+- Sprite de martelo:
+<p align="center">
+    <img src="sprites/martelo.png"width="60">
+    <br>
+   Figura X. Sprite de martelo
+    
+</p>
+
+- Sprite de arbusto:
+<p align="center">
+    <img src="sprites/arbusto.png"width="60">
+    <br>
+   Figura X. Sprite de arbusto
+    
+</p>
+
+- Sprite de toupeira:
+<p align="center">
+    <img src="sprites/toupeira.png"width="60">
+    <br>
+   Figura X. Sprite de toupeira
+</p>
+
 ### Movimentações (Mouse e Toupeiras)
 
 **Movimentação do Mouse**
@@ -320,13 +341,6 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
     Figura X. Tela do jogo ao reiniciar
 </p>
 
-- Ao pressionar o botão KEY3 na placa durante o jogo, o jogo é encerrado.
-<p align="center">
-    <img src="" alt="Tela do encerramento" width="500">
-    <br>
-    Figura X. Tela do jogo ao encerrar
-</p>
-
 - Quando o tempo de 60 segundos se esgota durante o jogo, a tela do jogo é substituída pela tela de game over.
 
 <p align="center">
@@ -336,6 +350,12 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 </p>
 
 - Ao clicar com o botão esquerdo do mouse nas toupeiras que aparecem durante o jogo, os pontos são atualizados no display de 7 segmentos.
+
+<p align="center">
+    <img src="imagens/pontuacao.jpg" alt="Pontuação no display 7 segmentos" width="400">
+    <br>
+    Figura X. Pontuação no display 7 segmentos
+</p>
 
 
 ## Conclusão
