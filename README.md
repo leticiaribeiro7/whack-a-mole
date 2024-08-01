@@ -31,12 +31,12 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
     - [Compilador GCC](#compilador-gcc)
     - [Monitor Tubo CRT](#monitor-tubo-crt)
     - [Padrão VGA](#padrão-vga)
-    - [Mouse]
+    - [Mouse](#mouse)
     - [Processador Gráfico](#processador-gráfico)
     - [Módulo de Kernel]
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - [Sprites Novos e Telas do Jogo](#sprites-novos-e-telas-do-jogo)
+    - [Sprites Novos](#sprites-novos)
     - [Colisão](#colisão)
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
@@ -113,6 +113,16 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
     Figura 3. Conexões entre o FPGA e o VGA
 </p>
 
+### Mouse
+<p align="justify">
+    Um mouse é utilizado como dispositivo de entrada para o jogador. Com o botão esquerdo, o jogador clica nas toupeiras para jogar, enquanto o movimento do mouse permite um controle mais rápido e preciso. O mouse é conectado a placa por meio de uma porta USB.
+</p>
+<p align="center">
+    <img src="imagens/mouse.jpg" alt="Mouse conectado na placa" width="500">
+    <br>
+    Figura 4. Mouse conectado a placa de desenvolvimento DE1-Soc.
+</p>
+
 ### Processador Gráfico
 <p align="justify"> 
     O Processador Gráfico é responsável pela renderização e execução de um conjunto de instruções que permitem mover e controlar <i>sprites</i>, modificar a configuração do <i>background</i> da tela e renderizar polígonos, como quadrados e triângulos. As saídas do Processador Gráfico incluem os sinais de sicronização horizontal <i>(h_sync)</i> e vertical <i>(v_sync)</i> do monitor VGA, além dos bits de cores RGB <i>(Red, Green, Blue)</i>. A Figura 4 ilustra a arquitetura completa do processador gráfico, conforme detalhado no TCC.
@@ -156,7 +166,7 @@ Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, 
 
 ## Implementação do Jogo
 
-### Sprites Novos e Telas do Jogo
+### Sprites Novos
 <p align="justify">
 Para o desenvolvimento do jogo, foram criados três sprites na memória: martelo, arbusto e toupeira. Foi utilizada a ferramenta <a href="https://www.pixilart.com">Pixilart</a> para desenhar cada sprite com uma dimensão de 20x20 pixels, criando-os pixel a pixel. Após o desenho ser finalizado, as imagens foram salvas no formato adequado.
 
@@ -184,10 +194,6 @@ Para o processamento das imagens, foi utilizada a biblioteca <a href="https://py
     <img src="sprites/toupeira.png"width="60">
     <br>
    Figura X. Sprite de toupeira
-</p>
-
-<p align="justify">
-As telas do jogo (vide [Cenários de Teste]) também foram feitas com a mesma abordagem dos sprites, porém os desenhos foram feitos em tamanho 80x60, dado que o monitor com VGA possui 640x480 pixels e cada bloco personalizável do processador gráfico tem tamanho 8x8. O código em Python está preparado para receber qualquer tamanho de imagem, basta passar por parâmetro a largura e a altura desejada.
 </p>
 
 ### Colisão
