@@ -69,7 +69,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 - LEDS, chaves e botões, entre outros.
 
 <p align="center">
-    <img src="Imagens/placa.jpg" alt="Placa DE1-SoC" width="500">
+    <img src="imagens/placa.jpg" alt="Placa DE1-SoC" width="500">
     <br>
     Figura 1. Placa de desenvolvimento DE1-SoC.
 </p>
