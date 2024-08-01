@@ -37,7 +37,7 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 
 - [Threads](#threads)
 - [Implementação do Jogo](#implementação-do-jogo)
-    - [Sprites novos](#sprites-novos)
+    - [Sprites Novos](#sprites-novos)
     - Colisão 
     - [Movimentações (mouse e toupeiras)](#movimentações-mouse-e-toupeiras)
     - [Uso dos Botões](#uso-dos-botões)
@@ -183,8 +183,8 @@ Para compor o jogo, foram criados três sprites na memória de sprites: martelo,
     <img src="sprites/toupeira.png"width="60">
     <br>
    Figura X. Sprite de toupeira
-    
 </p>
+
 ### Movimentações (Mouse e Toupeiras)
 
 **Movimentação do Mouse**
