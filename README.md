@@ -120,7 +120,7 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
 
 ### Mouse
 <p align="justify">
-    Um mouse é utilizado como dispositivo de entrada para o jogador. Com o botão esquerdo, o jogador clica nas toupeiras para jogar, enquanto o movimento do mouse permite um controle mais rápido e preciso. O mouse é conectado a placa por meio de uma porta USB.
+    Um mouse é utilizado como dispositivo de entrada para interagir com as toupeiras que aparecem aleatoriamente na tela. O botão esquerdo do mouse é usado para acertar as toupeiras, acumulando pontos a cada acerto bem-sucedido e o movimento do mouse controla a posição de um martelo na tela, permitindo ao jogador responder rapidamente às ações do jogo. O mouse está conectado à placa por meio de uma porta USB e a lógica do funcionamento do mouse é gerenciada por uma thread.
 </p>
 <p align="center">
     <img src="imagens/mouse.jpg" alt="Mouse conectado na placa" width="500">
@@ -270,14 +270,20 @@ Isso garante que o processo principal aguardará a conclusão da thread1. O mesm
 **Thread1 - Movimento do Martelo**
 
 <p align="justify">
-O movimento do martelo, controlado pelo jogador, é gerenciado pela thread1. Esta thread é responsável por detectar os movimentos do mouse e atualizar a posição do martelo na tela em tempo real. Além disso, para garantir que o martelo permaneça dentro dos limites da tela, foi implementada uma limitação do cursor para evitar que o jogador movimente o martelo para uma coordenada inválida.
-A contagem de pontuação também está integrada nesta thread. Cada vez que o jogador acerta uma toupeira com o martelo, a pontuação é atualizada.
+O movimento do martelo, controlado pelo jogador, é gerenciado pela thread1. Esta thread é responsável por detectar os movimentos do mouse e atualizar a posição do martelo na tela em tempo real. 
+
+Além disso, para garantir que o martelo permaneça dentro dos limites da tela, foi implementada uma limitação do cursor para evitar que o jogador movimente o martelo para uma coordenada inválida. 
+
+A contagem de pontuação também está integrada nesta thread. Cada vez que o jogador acerta uma toupeira com o martelo, a pontuação é atualizada. Manter a lógica de pontuação na thread1 foi necessária para garantir garantir que a contagem e a exibição da pontuação não fossem atrasadas por outras operações do jogo.
 <p>
 
 **Thread2 - Movimento das Toupeiras**
 <p align="justify">
-As toupeiras se movem de forma independente do jogador e são gerenciadas pela thread2. Esta thread controla o aparecimento e o desaparecimento das toupeiras de maneira aleatória.
-Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, um temporizador é utilizado nesta thread. Esse temporizador define o intervalo de tempo em que cada toupeira permanece visível antes de desaparecer e reaparecer em outro lugar. A detecção dos botões da placa também faz parte desta thread.
+As toupeiras se movem de forma independente do jogador e são gerenciadas pela thread2. Esta thread controla o aparecimento e o desaparecimento das toupeiras de maneira aleatória. 
+
+Para garantir a aleatoriedade e o tempo adequado de aparecimento das toupeiras, um temporizador é utilizado nesta thread. A implementação do temporizador nessa thread se deu para garantir que não haja atrasos por outras operações do jogo. Esse temporizador define o intervalo de tempo em que cada toupeira permanece visível antes de desaparecer e reaparecer em outro lugar. 
+
+A detecção dos botões da placa também faz parte desta thread para garantir que a interface do usuário responda rapidamente às interações do jogador.
 </p>
 
 ## Implementação do Jogo
