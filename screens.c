@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include "headers/graphics_processor.h"
 #include "headers/spritesRGB.h"
+#include "headers/screensRGB.h"
+#include "headers/screens.h"
 
 
-
-void draw_stop_screen() {
-    // for........
-    // setbackground..
+void draw_initial_screen() {
     int i;
     for (i = 0; i < 4800; i++) {
         int R = initialScreen[i][0];
