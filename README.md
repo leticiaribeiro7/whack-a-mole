@@ -543,6 +543,8 @@ Em conclusão, o projeto demonstrou que a comunicação entre o HPS e o Processa
 
 <b>Processador Gráfico: projeto para comunicação entre processador gráfico e processador ARM. GitHub, 2024.<b> Disponível em: <https://github.com/vitoriatanan/Processador-Grafico/tree/main?tab=readme-ov-file#sobre>.
 
+<b>COLLISION DETECTION. Learn OpenGL, 2024<b>. Disponível em: <https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection>. 
+
 <b>Character device drivers — The Linux Kernel documentation</b>. Disponível em: <https://linux-kernel-labs.github.io/refs/heads/master/labs/device_drivers.html>.
 
 <b>Memory mapping — The Linux Kernel documentation</b>. Disponível em: <https://linux-kernel-labs.github.io/refs/heads/master/labs/memory_mapping.html>.
