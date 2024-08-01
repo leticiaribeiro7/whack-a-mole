@@ -29,6 +29,7 @@ int segmentos[10] = {
     0b0010000
 };
 
+int button0, button1, button2, button3;
 
 void mapPeripherals() {
     
@@ -70,4 +71,19 @@ void limitarCursor(int *x, int *y) {
 
 uint8_t display(int number) {
     return segmentos[number];
+}
+
+/**
+ * \brief Função que lê o estado dos botões e atualiza as variáveis correspondentes
+ * 
+ * Esta função lê os valores dos botões conectados ao dispositivo e 
+ * atualiza as variáveis button0, button1, button2 e button3 com base 
+ * no estado de cada botão. Cada botão é mapeado para um bit específico
+ * na variável KEY_ptr.
+ */
+void readButtons() {
+    button0 = ((*KEY_ptr & 0b0001) == 0); // iniciar
+    button1 = ((*KEY_ptr & 0b0010) == 0); // pausar
+    button2 = ((*KEY_ptr & 0b0100) == 0); // reiniciar
+    button3 = ((*KEY_ptr & 0b1000) == 0); // parar
 }

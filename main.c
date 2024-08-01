@@ -30,39 +30,9 @@ extern volatile int* HEX5_ptr;
 
 extern volatile int* KEY_ptr;
 
-int button0, button1, button2, button3;
+extern int button0, button1, button2, button3;
 int state = 0; /* Controladora de estado*/
 int pontuacao = 0;
-
-
-// /* Array para mapeamento dos segmentos em binário para decimal */
-// int segmentos[10] = {
-//     0b1000000,
-//     0b1111001,
-//     0b0100100,
-//     0b0110000,
-//     0b0011001,
-//     0b0010010,
-//     0b0000010,
-//     0b1111000,
-//     0b0000000,
-//     0b0010000
-// };
-
-/**
- * \brief Função que lê o estado dos botões e atualiza as variáveis correspondentes
- * 
- * Esta função lê os valores dos botões conectados ao dispositivo e 
- * atualiza as variáveis button0, button1, button2 e button3 com base 
- * no estado de cada botão. Cada botão é mapeado para um bit específico
- * na variável KEY_ptr.
- */
-void readButtons() {
-    button0 = ((*KEY_ptr & 0b0001) == 0); // iniciar
-    button1 = ((*KEY_ptr & 0b0010) == 0); // pausar
-    button2 = ((*KEY_ptr & 0b0100) == 0); // reiniciar
-    button3 = ((*KEY_ptr & 0b1000) == 0); // parar
-}
 
 
 /**
@@ -429,7 +399,7 @@ int main() {
 
     write_sprites();
 
-    /* Apaga mostrador de 7 segmentos */
+    /* Apaga os 3 primeiros dígitos do mostrador de 7 segmentos */
     *HEX3_ptr = 0b1111111;
     *HEX4_ptr = 0b1111111;
     *HEX5_ptr = 0b1111111;
