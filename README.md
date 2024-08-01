@@ -377,7 +377,7 @@ Os cenários de testes foram desenvolvidos para verificar as funções do projet
 - Ao clicar com o botão esquerdo do mouse nas toupeiras que aparecem durante o jogo, os pontos são atualizados no display de 7 segmentos.
 
 <p align="center">
-    <img src="imagens/pontuacao.jpg" alt="Pontuação no display 7 segmentos" width="400">
+    <img src="imagens/pontuacao.jpg" alt="Pontuação no display 7 segmentos" width="300">
     <br>
     Figura X. Pontuação no display 7 segmentos
 </p>
