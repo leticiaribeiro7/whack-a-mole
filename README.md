@@ -103,35 +103,16 @@ O monitor utilizado é um modelo de tubo CRT (<i>Cathode Ray Tube</i>) da DELL, 
     Figura 3. Conexões entre o FPGA e o VGA
 </p>
 
-## Arquitetura e Instruções do Processador Gráfico
+### Processador Gráfico
 <p align="justify"> 
     O Processador Gráfico é responsável pela renderização e execução de um conjunto de instruções que permitem mover e controlar <i>sprites</i>, modificar a configuração do <i>background</i> da tela e renderizar polígonos, como quadrados e triângulos. As saídas do Processador Gráfico incluem os sinais de sicronização horizontal <i>(h_sync)</i> e vertical <i>(v_sync)</i> do monitor VGA, além dos bits de cores RGB <i>(Red, Green, Blue)</i>. A Figura 4 ilustra a arquitetura completa do processador gráfico, conforme detalhado no TCC.
 </p>
 <p align="center">
-    <img src="Imagens/arquitetura_processador.png" alt="VGA" width="500">
+    <img src="imagens/arquitetura_processador.png" alt="VGA" width="500">
     <br>
     Figura 4. Estrutura Interna do Processador Gráfico. (Fonte: TCC de [Gabriel B. Alves])
 </p>
 
-### Módulo de Desenho
-<p align="justify"> 
-O Módulo de Desenho gerencia todo o processo de renderização dos <i>pixels</i> no monitor VGA. Ele converte e envia os dados de cor RGB para cada <i>pixel</i>, garantindo a precisão da imagem exibida no monitor. A utilização de uma arquitetura de <i>Pipeline</i> permite ao módulo processar múltiplas instruções ao mesmo tempo, aumentando a eficiência do processamento e previnindo distorções na saída do monitor VGA.
-</p>
-
-### Controlador VGA
-<p align="justify"> 
-O Controlador VGA é responsável por gerar os sinais de sicronização vertical (<i>vsync</i>) e horizontal (<i>hsync</i>), essenciais para a exibição correta dos <i>frames</i> no monitor. Estes sinais são fundamentais para coordenar o processo de varredura do monitor, que ocorre da esquerda para a direita e de cima para baixo. O controlador também fornece as coordenadas X e Y para o processo de varredura, assefurando que cada linha do <i>frame</i> seja renderizada corretamente. Considerando os tempos de sincronização vertical e horizontal, cada tela é atualizada a cada 16,768 ms, resultando em uma taxa de aproximadamente 60 <i>frames</i> por segundo. O módulo coordena ainda a geração dos sinais de sicronização para evitar distorções e garantir que a exibição esteja dentro dos padrões de resolução e taxa de atualização estabelecidos.
-</p>
-
-### Memória de Sprites
-<p align="justify"> 
-A memória de <i>sprites</i> é responsável por armazenar os <i>bitmapes</i> de cada <i>sprite</i>. Ela possui uma capacidade de 12.800 palavras de 9 bits, sendo 3 bits destinados para cada componente de cor RBG. Cada <i>sprite</i> tem um tamanho fixo de 20x20 <i>pixels</i>, ocupando 400 posições de memória. Isso permite que até 32 <i>sprites</i> distintos sejam armazenados simultaneamente para uso. Esta estrutura é essencial para a correta exibição e manipulação dos <i>sprites</i> na tela.
-</p>
-
-### Memória de Background
-<p align="justify">
-A memória de <i>background</i> é usada para modificar pequenas partes do fundo da tela. Ela consiste em 4.800 palavras de 9 bits cada, com 3 bits destinados a cada componente de cor RGB. Esta configuração permite ajustar e atualizar dinamicamente seções específicas do <i>background</i>, garantindo flexibilidade e precisão na exibição gráfica.
-</p>
 
 
 ## Threads
@@ -178,7 +159,7 @@ O sprite do martelo é atualizado com as novas coordenadas utilizando a função
 <p align="justify">
 No jogo, as toupeiras se movem verticalmente dentro de limites definidos por valores máximos (max_y) e mínimos (min_y). Cada toupeira possui um intervalo de movimentação aleatório entre 1 e 3 segundos, determinado pela expressão:
 
- ``` toupeiras[i]->interval = rand() % 3 + 1 ```.
+``` toupeiras[i]->interval = rand() % 3 + 1 ```.
 <p>
 <p align="justify">
 As toupeiras se movem para cima até atingirem o limite mínimo (min_y). Ao alcançar esse limite, elas invertem a direção e começam a descer. Durante esse tempo, as toupeiras continuam a se mover até atingirem o limite máximo (max_y).
@@ -224,12 +205,11 @@ Para evitar que qualquer botão altere o estado do jogo a qualquer momento, foi 
 
 
 
+
 ### Fluxograma da Solução Geral do Projeto
 
-
-
 <p align="center">
-    <img src="Imagens/fluxograma.jpeg" alt="Fluxograma" width="600">
+    <img src="imagens/fluxograma.png" alt="Fluxograma" width="600">
     <br>
     Figura 11. Fluxograma da Solução Geral do Projeto.
 </p>
