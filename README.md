@@ -1,4 +1,9 @@
-<h1 align="center"> Whack a Mole - Jogo 2D</h1>
+
+<p align="center">
+    <img src="imagens/header.png" width="300">
+    <br>
+
+</p>
 
 ## Sobre
 
@@ -58,21 +63,20 @@ Além disso, o projeto envolveu a otimização do módulo de Kernel Linux e da b
 ### Kit de desenvolvimento DE1-SoC
 
 <p align="justify">
-    A placa de desenvolvimento DE1-SoC é uma plataforma baseada no chip Altera Cyclone V SoC, que integra um processador ARM Cortex-A9 dual-core com uma FPGA da família Cyclone V. A DE1-SoC possui uma ampla variedade de periféricos e interfaces, incluindo:
+    A placa de desenvolvimento DE1-SoC é uma plataforma baseada no chip Altera Cyclone V SoC, que integra um processador ARM Cortex-A9 dual-core com uma FPGA da família Cyclone V. A DE1-SoC possui uma ampla variedade de periféricos e interfaces. Os periféricos utilizados nesse projeto foram como está numerado na imagem:
 </p>
 
-
-- Interfaces de entrada/saída;
-- Conexões de áudio de vídeo;
-- Interface USB;
-- Conexões Ethernet;
-- LEDS, chaves e botões, entre outros.
-
 <p align="center">
-    <img src="imagens/placa.jpg" alt="Placa DE1-SoC" width="500">
+    <img src="imagens/placa-edt.png" alt="Placa DE1-SoC" width="500">
     <br>
     Figura 1. Placa de desenvolvimento DE1-SoC.
 </p>
+
+
+1. <a href="https://github.com/leticiaribeiro7/whack-a-mole?tab=readme-ov-file#padr%C3%A3o-vga">Padrão VGA</a>
+2. <a href="https://github.com/leticiaribeiro7/whack-a-mole?tab=readme-ov-file#mouse">Entrada USB para conectar o mouse</a>
+3. <a href="https://github.com/leticiaribeiro7/whack-a-mole?tab=readme-ov-file#display-7-segmentos">Display 7 segmentos para mostrar pontuação</a>
+4. <a href="https://github.com/leticiaribeiro7/whack-a-mole?tab=readme-ov-file#uso-dos-bot%C3%B5es">Push buttons para funcionalidades do jogo</a>
 
 ### Linguagem C
 <p align="justify">
